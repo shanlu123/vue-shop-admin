@@ -1,9 +1,8 @@
 import Vue from 'vue'
-import { Button, Form, FormItem, Input, Row, Col } from 'element-ui'
+import { Button, Form, FormItem, Input, Message } from 'element-ui'
 
 Vue.use(Button)
 Vue.use(Input)
-Vue.use(Row)
-Vue.use(Col)
 Vue.use(Form)
 Vue.use(FormItem)
+Vue.prototype.$message = Message // Message需要挂载到原型上使用

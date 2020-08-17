@@ -1,16 +1,16 @@
 <template>
   <div class="bg-login">
     <div class="login_form">
-      <el-form label-width="60px">
-        <el-form-item label="用户名">
-          <el-input prefix-icon="iconfont icon-user"></el-input>
+      <el-form label-width="70px" :model="loginInfo" :rules="loginFormRules" ref="loginFormRef" >
+        <el-form-item label="用户名" prop="username">
+          <el-input prefix-icon="iconfont icon-user" v-model="loginInfo.username"></el-input>
         </el-form-item>
-        <el-form-item label="密码">
-          <el-input prefix-icon="iconfont icon-3702mima"></el-input>
+        <el-form-item label="密码" prop="password">
+          <el-input prefix-icon="iconfont icon-3702mima" type="password" v-model="loginInfo.password"></el-input>
         </el-form-item>
         <el-form-item class="btns">
-          <el-button type="primary" plain>登录</el-button>
-          <el-button type="primary" plain>重置</el-button>
+          <el-button type="primary" plain @click="submit">登录</el-button>
+          <el-button type="primary" plain @click="reset">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -18,7 +18,42 @@
 </template>
 
 <script>
-export default {}
+export default {
+  data: function () {
+    return {
+      loginInfo: {
+        username: '',
+        password: ''
+      },
+      loginFormRules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, max: 18, message: '长度在 6 到 18 个字符', trigger: 'blur' }
+        ]
+      }
+    }
+  },
+  methods: {
+    reset () {
+      this.$refs.loginFormRef.resetFields()
+    },
+    submit () {
+      this.$refs.loginFormRef.validate(async valid => {
+        if (!valid) return
+        const res = await this.$http.post('login', this.loginInfo)
+        if (res.data.meta.status === 200) {
+          this.$message.success('登录成功')
+        } else {
+          this.$message.error('登录失败')
+        }
+      })
+    }
+  }
+}
 </script>
 
 <style scoped>
@@ -37,6 +72,6 @@ export default {}
   opacity: 0.5;
 }
 .btns {
-  float:right;
+  float: right;
 }
 </style>
