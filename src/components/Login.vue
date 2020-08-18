@@ -1,12 +1,13 @@
 <template>
   <div class="bg-login">
     <div class="login_form">
-      <el-form label-width="70px" :model="loginInfo" :rules="loginFormRules" ref="loginFormRef" >
+      <el-form label-width="70px" :model="loginInfo" :rules="loginFormRules" ref="loginFormRef">
         <el-form-item label="用户名" prop="username">
           <el-input prefix-icon="iconfont icon-user" v-model="loginInfo.username"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-          <el-input prefix-icon="iconfont icon-3702mima" type="password" v-model="loginInfo.password"></el-input>
+          <el-input prefix-icon="iconfont icon-3702mima" type="password" v-model="loginInfo.password"
+          ></el-input>
         </el-form-item>
         <el-form-item class="btns">
           <el-button type="primary" plain @click="submit">登录</el-button>
@@ -19,7 +20,7 @@
 
 <script>
 export default {
-  data: function () {
+  data: function() {
     return {
       loginInfo: {
         username: '',
@@ -38,10 +39,10 @@ export default {
     }
   },
   methods: {
-    reset () {
+    reset() {
       this.$refs.loginFormRef.resetFields()
     },
-    submit () {
+    submit() {
       this.$refs.loginFormRef.validate(async valid => {
         if (!valid) return
         const res = await this.$http.post('login', this.loginInfo)
@@ -60,7 +61,7 @@ export default {
 
 <style scoped>
 .bg-login {
-  background-image: url("../assets/images/bg.jpg");
+  background-image: url('../assets/images/bg.jpg');
   width: 100%;
   height: 100%;
 }
