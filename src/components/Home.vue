@@ -35,14 +35,14 @@
         <div class="toggle-button" @click="handleCollapse">
           <span :class="isCollapse? 'el-icon-s-unfold' : 'el-icon-s-fold' "></span>
         </div>
-        <el-menu background-color="#d3dce6" unique-opened :collapse="isCollapse" :collapse-transition="false">
+        <el-menu background-color="#d3dce6" unique-opened :collapse="isCollapse" :collapse-transition="false" router>
           <el-submenu :index="menu.id.toString()" v-for="(menu, index) in menuList" :key="index">
             <template slot="title">
               <i :class="iconObj[menu.id]"></i>
               <span>{{ menu.authName }}</span>
             </template>
             <el-menu-item-group v-for="(item, index) in menu.children" :key="index">
-              <el-menu-item :index="item.id.toString()">
+              <el-menu-item :index="item.path">
                 <span>{{ item.authName }}</span>
               </el-menu-item>
             </el-menu-item-group>
