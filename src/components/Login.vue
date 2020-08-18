@@ -23,8 +23,8 @@ export default {
   data: function() {
     return {
       loginInfo: {
-        username: '',
-        password: ''
+        username: 'admin',
+        password: '123456'
       },
       loginFormRules: {
         username: [
