@@ -1,5 +1,95 @@
 <template>
-  <el-button @click="loginout">退出登录</el-button>
+  <el-container>
+    <!-- 头部 -->
+    <el-header>
+      <el-row type="flex" class="row-bg" justify="space-between">
+        <el-col span="10">
+          <div class="grid-content">
+            <el-row>
+              <el-col span="6">
+                <div class="grid-content">
+                  <img src="https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png" alt="logo"/>
+                </div>
+              </el-col>
+              <el-col span="18">
+                <div class="grid-content">
+                  <p class="title">后台管理系统</p>
+                </div>
+              </el-col>
+            </el-row>
+          </div>
+        </el-col>
+        <el-col span="2">
+          <div class="grid-content">
+            <el-button @click="loginout">退出</el-button>
+          </div>
+        </el-col>
+      </el-row>
+    </el-header>
+    <el-container>
+      <!-- 侧边栏 -->
+      <el-aside width="200px">
+        <el-menu background-color="#d3dce6">
+          <el-submenu index="1">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>导航一</span>
+            </template>
+            <el-menu-item-group>
+              <template slot="title">
+                <i class="el-icon-location"></i>
+                <span>分组一</span>
+              </template>
+            </el-menu-item-group>
+            <el-menu-item-group>
+              <template slot="title">
+                <i class="el-icon-location"></i>
+                <span>分组二</span>
+              </template>
+            </el-menu-item-group>
+          </el-submenu>
+          <el-submenu index="2">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>导航一</span>
+            </template>
+            <el-menu-item-group>
+              <template slot="title">
+                <i class="el-icon-location"></i>
+                <span>分组一</span>
+              </template>
+            </el-menu-item-group>
+          </el-submenu>
+          <el-submenu index="3">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>导航一</span>
+            </template>
+            <el-menu-item-group>
+              <template slot="title">
+                <i class="el-icon-location"></i>
+                <span>分组一</span>
+              </template>
+            </el-menu-item-group>
+          </el-submenu>
+          <el-submenu index="4">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>导航一</span>
+            </template>
+            <el-menu-item-group>
+              <template slot="title">
+                <i class="el-icon-location"></i>
+                <span>分组一</span>
+              </template>
+            </el-menu-item-group>
+          </el-submenu>
+        </el-menu>
+      </el-aside>
+      <!-- 主体 -->
+      <el-main>Main</el-main>
+    </el-container>
+  </el-container>
 </template>
 
 <script>
@@ -12,3 +102,43 @@ export default {
   }
 }
 </script>
+<style scoped>
+.el-container {
+  width: 100%;
+  height: 100%;
+}
+.el-header {
+  background-color: #b3c0d1;
+  color: #333;
+  text-align: center;
+  line-height: 60px;
+}
+
+.el-aside {
+  background-color: #d3dce6;
+  text-align: center;
+}
+
+.el-main {
+  background-color: #e9eef3;
+  color: #333;
+  text-align: center;
+  line-height: 160px;
+}
+.grid-content {
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.title {
+  width: 100%;
+  height: 100%;
+  font-size: 20px;
+}
+</style>
