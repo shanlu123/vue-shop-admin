@@ -77,7 +77,7 @@
         <el-table-column label="操作">
           <template v-slot="scope">
             <el-button type="primary" size="mini" icon="el-icon-edit" @click="edit(scope.row.id)"></el-button>
-            <el-button type="danger" size="mini" icon="el-icon-delete"></el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="delUser(scope.row.id)"></el-button>
             <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
                 <el-button type="warning" size="mini" icon="el-icon-setting"></el-button>
             </el-tooltip>
@@ -251,23 +251,41 @@ export default {
           this.$message.error('修改失败')
         }
       })
+    },
+    // 删除用户
+    async delUser(id) {
+      const delRes = await this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err) // 捕获取消的报错
+      // 用户点击确定，delRes为字符串"confirm"
+      // 用户点击取消，delRes为字符串"cancel"
+      if (delRes !== 'confirm') return this.$message.info('已取消删除')
+      const res = await this.$http.delete(`users/${id}`)
+      if (res.data.meta.status === 200) {
+        this.$message.success('删除成功')
+        this.getUserList()
+      } else {
+        this.$message.error('删除失败:' + res.data.meta.msg)
+      }
     }
   }
 }
 </script>
 <style scoped>
-.box-card {
-  margin-top: 20px;
-  padding: 0;
-}
-.table {
-  margin-top: 20px;
-}
-.el-tag {
-  margin: 0 5px;
-  padding: 0 20px;
-}
-.el-pagination {
-  margin-top: 20px;
-}
+  .box-card {
+    margin-top: 20px;
+    padding: 0;
+  }
+  .table {
+    margin-top: 20px;
+  }
+  .el-tag {
+    margin: 0 5px;
+    padding: 0 20px;
+  }
+  .el-pagination {
+    margin-top: 20px;
+  }
 </style>
