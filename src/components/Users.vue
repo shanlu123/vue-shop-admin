@@ -28,14 +28,16 @@
         <el-table-column prop="role_name" label="角色" width="180"></el-table-column>
         <el-table-column label="状态" width="180">
           <template v-slot="scope">
-            <el-switch v-model="scope.row.mg_state"></el-switch>
+            <el-switch v-model="scope.row.mg_state" @change="mgStateChange(scope.row)"></el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作">
           <template>
             <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>
             <el-button type="danger" size="mini" icon="el-icon-delete"></el-button>
-            <el-button type="warning" size="mini" icon="el-icon-setting"></el-button>
+            <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
+                <el-button type="warning" size="mini" icon="el-icon-setting"></el-button>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -92,6 +94,16 @@ export default {
       // console.log(curPageNum)
       this.queryParams.pagenum = curPageNum
       this.getUserList()
+    },
+    // 用户状态开关切换
+    async mgStateChange(curUserInfo) {
+      // console.log(curUserInfo.mg_state)
+      const res = await this.$http.put(`users/${curUserInfo.id}/state/${curUserInfo.mg_state}`)
+      if (res.data.meta.status === 200) {
+        this.$message.success('修改成功')
+      } else {
+        this.$message.error('修改失败' + res.data.meta.msg)
+      }
     }
   }
 }
