@@ -20,25 +20,36 @@
         </el-col>
       </el-row>
       <!-- 表格 -->
-      <el-table :data="userList" stripe style="width: 100%" border class="table" size="mini">
+      <el-table :data="userList" stripe  style="width: 100%" border class="table" size="mini" >
         <el-table-column type="index" label="#" width="50"></el-table-column>
         <el-table-column prop="username" label="姓名" width="180"></el-table-column>
         <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
         <el-table-column prop="mobile" label="电话" width="180"></el-table-column>
         <el-table-column prop="role_name" label="角色" width="180"></el-table-column>
-        <el-table-column  label="状态" width="180">
-            <template v-slot="scope">
-                <el-switch v-model="scope.row.mg_state"></el-switch>
-            </template>
+        <el-table-column label="状态" width="180">
+          <template v-slot="scope">
+            <el-switch v-model="scope.row.mg_state"></el-switch>
+          </template>
         </el-table-column>
         <el-table-column label="操作">
-        <template>
+          <template>
             <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>
             <el-button type="danger" size="mini" icon="el-icon-delete"></el-button>
             <el-button type="warning" size="mini" icon="el-icon-setting"></el-button>
-        </template>
+          </template>
         </el-table-column>
       </el-table>
+      <!-- 分页 -->
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="queryParams.pagenum"
+        :page-sizes="[1, 2, 3, 5, 10]"
+        :page-size="queryParams.pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      >
+      </el-pagination>
     </el-card>
   </div>
 </template>
@@ -60,6 +71,7 @@ export default {
     this.getUserList()
   },
   methods: {
+    // 获取用户列表数据
     async getUserList() {
       const res = await this.$http.get('users', { params: this.queryParams })
       if (res.data.meta.status === 200) {
@@ -68,6 +80,18 @@ export default {
       } else {
         this.$message.error(res.data.meta.msg)
       }
+    },
+    // 监听pageSize改变
+    handleSizeChange(curPageSize) {
+      // console.log(curPageSize)
+      this.queryParams.pagesize = curPageSize
+      this.getUserList()
+    },
+    // 监听当前页数pageNum改变
+    handleCurrentChange(curPageNum) {
+      // console.log(curPageNum)
+      this.queryParams.pagenum = curPageNum
+      this.getUserList()
     }
   }
 }
@@ -80,8 +104,11 @@ export default {
 .table {
   margin-top: 20px;
 }
-.el-tag{
-    margin:0 5px;
-    padding:0 20px;
+.el-tag {
+  margin: 0 5px;
+  padding: 0 20px;
+}
+.el-pagination {
+  margin-top: 20px;
 }
 </style>

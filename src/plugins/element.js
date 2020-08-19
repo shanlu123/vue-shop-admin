@@ -2,7 +2,7 @@ import Vue from 'vue'
 import {
   Button, Form, FormItem, Input, Message, Header, Container, Main, Aside, Row, Col, Avatar,
   Menu, Submenu, MenuItem, MenuItemGroup, Breadcrumb, BreadcrumbItem, Card, Table, TableColumn,
-  Tag, Switch
+  Tag, Switch, Pagination
 } from 'element-ui'
 
 Vue.use(Button)
@@ -27,4 +27,5 @@ Vue.use(Table)
 Vue.use(TableColumn)
 Vue.use(Tag)
 Vue.use(Switch)
+Vue.use(Pagination)
 Vue.prototype.$message = Message // Message需要挂载到原型上使用
