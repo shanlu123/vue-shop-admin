@@ -42,6 +42,26 @@
           <el-button type="primary" @click="submit">确 定</el-button>
         </span>
       </el-dialog>
+      <!-- 编辑用户弹出框 -->
+      <el-dialog title="编辑用户" :visible.sync="editFormVisible" width="30%" @close="editFormClose">
+        <!-- 编辑表单 -->
+        <el-form ref="editFormRef" :model="editForm" label-width="80px" :rules="editFormRules">
+          <el-form-item label="用户名" prop="username">
+             <el-input v-model="editForm.username" disabled></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱" prop="email">
+             <el-input v-model="editForm.email"></el-input>
+          </el-form-item>
+          <el-form-item label="手机" prop="mobile">
+             <el-input v-model="editForm.mobile"></el-input>
+          </el-form-item>
+        </el-form>
+        <!-- 底部 -->
+        <span slot="footer">
+          <el-button @click="editFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="editSubmit">确 定</el-button>
+        </span>
+      </el-dialog>
       <!-- 表格 -->
       <el-table :data="userList" stripe  style="width: 100%" border class="table" size="mini" >
         <el-table-column type="index" label="#" width="50"></el-table-column>
@@ -55,8 +75,8 @@
           </template>
         </el-table-column>
         <el-table-column label="操作">
-          <template>
-            <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>
+          <template v-slot="scope">
+            <el-button type="primary" size="mini" icon="el-icon-edit" @click="edit(scope.row.id)"></el-button>
             <el-button type="danger" size="mini" icon="el-icon-delete"></el-button>
             <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
                 <el-button type="warning" size="mini" icon="el-icon-setting"></el-button>
@@ -130,6 +150,18 @@ export default {
           { required: true, message: '请输入手机号码', trigger: 'blur' },
           { validator: checkMobile, trigger: 'blur' }
         ]
+      },
+      editFormVisible: false, // 编辑用户弹出层是否显示
+      editForm: {}, // 编辑用户表单数据
+      editFormRules: { // 编辑表单验证规则对象
+        email: [
+          { required: true, message: '请输入邮箱', trigger: 'blur' },
+          { validator: checkEmail, trigger: 'blur' }
+        ],
+        mobile: [
+          { required: true, message: '请输入手机号码', trigger: 'blur' },
+          { validator: checkMobile, trigger: 'blur' }
+        ]
       }
     }
   },
@@ -190,6 +222,35 @@ export default {
     // 添加用户对话框关闭
     addFormClose() {
       this.$refs.addFormRef.resetFields()
+    },
+    // 编辑用户对话框关闭
+    editFormClose() {
+      this.$refs.editFormRef.resetFields()
+    },
+    // 编辑(展示编辑对话框)
+    async edit(id) {
+      this.editFormVisible = true
+      const res = await this.$http.get(`users/${id}`) // 根据ID获取该用户的信息
+      this.editForm = res.data.data
+    },
+    // 编辑表单提交
+    editSubmit() {
+      this.$refs.editFormRef.validate(async (valid) => {
+        if (!valid) return
+        const res = await this.$http.put(`users/${this.editForm.id}`,
+          {
+            email: this.editForm.email,
+            mobile: this.editForm.mobile
+          }
+        )
+        this.editFormVisible = false // 关闭对话框
+        if (res.data.meta.status === 200) {
+          this.$message.success('修改成功')
+          this.getUserList()
+        } else {
+          this.$message.error('修改失败')
+        }
+      })
     }
   }
 }
