@@ -11,8 +11,8 @@
       <!-- 搜索 -->
       <el-row :gutter="20">
         <el-col :span="8">
-          <el-input placeholder="请输入内容">
-            <el-button slot="append" icon="el-icon-search"></el-button>
+          <el-input placeholder="请输入内容" v-model="queryParams.query"  clearable @clear="getUserList">
+            <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
           </el-input>
         </el-col>
         <el-col :span="2">
@@ -104,6 +104,10 @@ export default {
       } else {
         this.$message.error('修改失败' + res.data.meta.msg)
       }
+    },
+    // 搜索
+    search() {
+      this.getUserList()
     }
   }
 }
