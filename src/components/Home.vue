@@ -124,13 +124,6 @@ export default {
   background-color: #d3dce6;
   text-align: center;
 }
-
-.el-main {
-  background-color: #e9eef3;
-  color: #333;
-  text-align: center;
-  line-height: 160px;
-}
 .grid-content {
   height: 60px;
   display: flex;
