@@ -31,18 +31,24 @@
     </el-header>
     <el-container>
       <!-- 侧边栏 -->
-      <el-aside :width="isCollapse? '64px' : '200px'">
+      <el-aside :width="isCollapse ? '64px' : '200px'">
         <div class="toggle-button" @click="handleCollapse">
-          <span :class="isCollapse? 'el-icon-s-unfold' : 'el-icon-s-fold' "></span>
+          <span :class="isCollapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></span>
         </div>
-        <el-menu background-color="#d3dce6" unique-opened :collapse="isCollapse" :collapse-transition="false" router>
-          <el-submenu :index="menu.id.toString()" v-for="(menu, index) in menuList" :key="index">
+        <el-menu
+          background-color="#d3dce6"
+          unique-opened
+          :collapse="isCollapse"
+          :collapse-transition="false"
+          router
+          :default-active="activePath">
+          <el-submenu :index="menu.id.toString()" v-for="(menu, index) in menuList"  :key="index">
             <template slot="title">
               <i :class="iconObj[menu.id]"></i>
               <span>{{ menu.authName }}</span>
             </template>
             <el-menu-item-group v-for="(item, index) in menu.children" :key="index">
-              <el-menu-item :index="item.path">
+              <el-menu-item :index="item.path" @click="setActivePath(item.path)">
                 <span>{{ item.authName }}</span>
               </el-menu-item>
             </el-menu-item-group>
@@ -51,7 +57,7 @@
       </el-aside>
       <!-- 主体 -->
       <el-main>
-          <router-view></router-view>
+        <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
@@ -63,17 +69,19 @@ export default {
     return {
       menuList: [],
       iconObj: {
-        '125': 'iconfont icon-user',
-        '103': 'iconfont icon-tijikongjian',
-        '101': 'iconfont icon-shangpin',
-        '102': 'iconfont icon-danju',
-        '145': 'iconfont icon-baobiao'
+        125: 'iconfont icon-user',
+        103: 'iconfont icon-tijikongjian',
+        101: 'iconfont icon-shangpin',
+        102: 'iconfont icon-danju',
+        145: 'iconfont icon-baobiao'
       },
-      isCollapse: false
+      isCollapse: false,
+      activePath: ''
     }
   },
   created() {
     this.getMenuList()
+    this.activePath = window.sessionStorage.getItem('activePath')
   },
   methods: {
     loginout() {
@@ -92,6 +100,10 @@ export default {
     // 侧边栏展开或折叠
     handleCollapse() {
       this.isCollapse = !this.isCollapse
+    },
+    // 设置侧边栏默认选中菜单项
+    setActivePath(path) {
+      window.sessionStorage.setItem('activePath', path)
     }
   }
 }
