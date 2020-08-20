@@ -14,45 +14,21 @@
         <!-- 展开列开始-->
         <el-table-column width="100" align="center" type="expand">
           <template v-slot="scope">
-            <el-row
-              v-for="firstItem in scope.row.children"
-              :key="firstItem.id"
-              class="border-bottom center-in-col"
-            >
+            <el-row v-for="firstItem in scope.row.children" :key="firstItem.id" class="border-bottom center-in-col">
               <!-- 一级权限 -->
               <el-col :span="6">
-                <el-tag
-                  closable
-                  type="primary"
-                  @close="delRight(scope.row, firstItem)"
-                  >{{ firstItem.authName }}</el-tag
-                >
+                <el-tag closable type="primary" @close="delRight(scope.row, firstItem)">{{ firstItem.authName }}</el-tag>
               </el-col>
               <!-- 二级和三级权限 -->
               <el-col :span="18">
-                <el-row
-                  v-for="secondItem in firstItem.children"
-                  :key="secondItem.id"
-                  class="center-in-col"
-                >
+                <el-row v-for="secondItem in firstItem.children" :key="secondItem.id" class="center-in-col">
                   <!-- 二级权限 -->
                   <el-col :span="6">
-                    <el-tag
-                      type="success"
-                      closable
-                      @close="delRight(scope.row, secondItem)"
-                      >{{ secondItem.authName }}</el-tag
-                    >
+                    <el-tag type="success" closable @close="delRight(scope.row, secondItem)" >{{ secondItem.authName }}</el-tag>
                   </el-col>
                   <!-- 三级权限 -->
                   <el-col :span="18">
-                    <el-tag
-                      type="warning"
-                      v-for="thirdItem in secondItem.children"
-                      :key="thirdItem.id"
-                      closable
-                      @close="delRight(scope.row, thirdItem)"
-                    >
+                    <el-tag type="warning" v-for="thirdItem in secondItem.children" :key="thirdItem.id" closable @close="delRight(scope.row, thirdItem)">
                       {{ thirdItem.authName }}
                     </el-tag>
                   </el-col>
@@ -62,38 +38,26 @@
           </template>
         </el-table-column>
         <!-- 展开列结束-->
-        <el-table-column
-          width="100"
-          align="center"
-          type="index"
-          label="#"
-        ></el-table-column>
-        <el-table-column
-          prop="roleName"
-          label="角色名称"
-          width="300"
-          align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="roleDesc"
-          label="角色描述"
-          width="300"
-          align="center"
-        ></el-table-column>
+        <el-table-column width="100" align="center" type="index" label="#" ></el-table-column>
+        <el-table-column prop="roleName" label="角色名称" width="300" align="center"></el-table-column>
+        <el-table-column prop="roleDesc" label="角色描述" width="300" align="center"></el-table-column>
         <el-table-column label="操作" align="center">
           <template>
-            <el-button type="primary" size="mini" icon="el-icon-edit"
-              >编辑</el-button
-            >
-            <el-button type="danger" size="mini" icon="el-icon-delete"
-              >删除</el-button
-            >
-            <el-button type="warning" size="mini" icon="el-icon-setting"
-              >分配角色</el-button
-            >
+            <el-button type="primary" size="mini" icon="el-icon-edit" >编辑</el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete">删除</el-button>
+            <el-button type="warning" size="mini" icon="el-icon-setting" @click="giveRight" >分配权限</el-button>
           </template>
         </el-table-column>
       </el-table>
+      <!-- 分配权限对话框 -->
+      <el-dialog title="分配权限" :visible.sync="giveRightVisible" width="30%">
+        <el-tree :data="rightsList" show-checkbox default-expand-all :props="{ children: 'children', label: 'authName' }" node-key="id">
+        </el-tree>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="giveRightVisible = false">取 消</el-button>
+          <el-button type="primary" @click="giveRightVisible = false">确 定</el-button>
+        </span>
+      </el-dialog>
     </el-card>
   </div>
 </template>
@@ -102,7 +66,9 @@
 export default {
   data: function() {
     return {
-      rolesList: []
+      rolesList: [],
+      giveRightVisible: false, // 分配权限对话框显示与隐藏
+      rightsList: [] // 所有权限列表
     }
   },
   created() {
@@ -139,6 +105,17 @@ export default {
       } else {
         this.$message.error('删除失败  ', res.data.meta.msg)
       }
+    },
+    // 点击分配权限
+    async giveRight() {
+      const res = await this.$http.get('rights/tree')
+      console.log(res)
+      if (res.data.meta.status === 200) {
+        this.rightsList = res.data.data
+      } else {
+        this.$http.error('获取权限列表失败')
+      }
+      this.giveRightVisible = true
     }
   }
 }
