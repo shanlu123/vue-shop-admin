@@ -8,7 +8,7 @@
     </el-breadcrumb>
     <!-- 卡片视图 -->
     <el-card class="box-card" shadow="always">
-      <el-button class="btn-add" type="primary">添加角色</el-button>
+      <el-button class="btn-add" type="primary" @click="addDialogVisible=true">添加角色</el-button>
       <!-- 表格 -->
       <el-table :data="rolesList" stripe border style="width:100%" size="small">
         <!-- 展开列开始-->
@@ -61,9 +61,24 @@
           ref="treeRef"
         >
         </el-tree>
-        <span slot="footer" class="dialog-footer">
+        <span slot="footer">
           <el-button @click="giveRightVisible = false">取 消</el-button>
           <el-button type="primary" @click="giveRightSubmit">确 定</el-button>
+        </span>
+      </el-dialog>
+      <!-- 添加角色对话框 -->
+      <el-dialog title="添加角色" :visible.sync="addDialogVisible" width="50%"  @close="addDialogClose">
+        <el-form :model="addRoleForm" :rules="addRoleFormRules" ref="addRoleFormRef" label-width="100px">
+            <el-form-item label="角色名称" prop="roleName">
+              <el-input v-model="addRoleForm.roleName"></el-input>
+            </el-form-item>
+            <el-form-item label="角色描述" prop="roleDesc">
+              <el-input v-model="addRoleForm.roleDesc"></el-input>
+            </el-form-item>
+        </el-form>
+        <span slot="footer">
+          <el-button @click="addDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="addRoleSubmit">确 定</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -78,7 +93,20 @@ export default {
       giveRightVisible: false, // 分配权限对话框显示与隐藏
       rightsList: [], // 所有权限列表
       defaultKeys: [], // 存储所有已有三级权限的id
-      curRoleId: '' // 当前即将分配权限的id
+      curRoleId: '', // 当前即将分配权限的id
+      addDialogVisible: false, // 添加角色对话框显示与隐藏
+      addRoleForm: {
+        roleName: '',
+        roleDesc: ''
+      },
+      addRoleFormRules: {
+        roleName: [
+          { required: true, message: '请输入角色名称', trigger: 'blur' }
+        ],
+        roleDesc: [
+          { required: true, message: '请输入角色描述', trigger: 'blur' }
+        ]
+      }
     }
   },
   created() {
@@ -158,6 +186,25 @@ export default {
         this.$message.error('分配权限失败,' + res.data.meta.msg)
       }
       this.giveRightVisible = false
+    },
+    // 添加角色
+    addRoleSubmit() {
+      this.addDialogVisible = true
+      this.$refs.addRoleFormRef.validate(async valid => {
+        if (!valid) return false
+        const res = await this.$http.post('roles', this.addRoleForm)
+        if (res.data.meta.status === 201) {
+          this.$message.success('添加角色成功')
+          this.getRolesList()
+        } else {
+          this.$message.error('添加角色失败,' + res.data.meta.msg)
+        }
+        this.addDialogVisible = false
+      })
+    },
+    // 添加角色对话框关闭
+    addDialogClose() {
+      this.$refs.addRoleFormRef.resetFields()
     }
   }
 }
