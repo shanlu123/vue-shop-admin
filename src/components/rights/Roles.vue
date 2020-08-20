@@ -13,7 +13,27 @@
       <el-table :data="rolesList" stripe border style="width:100%" size="small">
         <el-table-column width="100" align="center" type="expand">
           <template v-slot="scope">
-            <pre>{{ scope.row }}</pre>
+            <el-row v-for="firstItem in scope.row.children" :key="firstItem.id" class="border-bottom center-in-col">
+                <!-- 一级权限 -->
+                <el-col :span="6">
+                   <el-tag closable type="primary">{{firstItem.authName}}</el-tag>
+                </el-col>
+                <!-- 二级和三级权限 -->
+                <el-col :span="18">
+                   <el-row v-for="secondItem in firstItem.children" :key="secondItem.id" class="center-in-col">
+                       <!-- 二级权限 -->
+                       <el-col :span="6">
+                          <el-tag type="success" closable>{{ secondItem.authName}}</el-tag>
+                       </el-col>
+                       <!-- 三级权限 -->
+                       <el-col :span="18">
+                           <el-tag  type="warning" v-for="thirdItem in secondItem.children" :key="thirdItem.id" closable>
+                               {{thirdItem.authName}}
+                           </el-tag>
+                       </el-col>
+                   </el-row>
+                </el-col>
+            </el-row>
           </template>
         </el-table-column>
         <el-table-column
@@ -79,5 +99,16 @@ export default {
 }
 .btn-add {
   margin-bottom: 20px;
+}
+.el-tag{
+    margin:5px;
+}
+.border-bottom{
+    padding:20px 0;
+    border-bottom:1px solid #eee;
+}
+.center-in-col{
+    display: flex;
+    align-items: center;
 }
 </style>
