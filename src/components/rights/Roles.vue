@@ -99,7 +99,12 @@
         </el-table-column>
       </el-table>
       <!-- 分配权限对话框 -->
-      <el-dialog title="分配权限" :visible.sync="giveRightVisible" width="40%">
+      <el-dialog
+        title="分配权限"
+        :visible.sync="giveRightVisible"
+        width="40%"
+        @close="rightsDialogClose"
+      >
         <el-tree
           :data="rightsList"
           show-checkbox
@@ -177,7 +182,7 @@ export default {
       this.getDefaultKeys(role) // 拿到所有已经拥有的三级权限id数组defautKeys[]
       this.giveRightVisible = true
     },
-    // 获取所有需要默认选中的三级权限
+    // 获取所有需要默认选中的三级权限的递归函数
     getDefaultKeys(role) {
       console.log('role:', role)
       if (role.children) {
@@ -187,6 +192,10 @@ export default {
       } else {
         this.defaultKeys.push(role.id)
       }
+    },
+    // 分配权限对话框关闭
+    rightsDialogClose() {
+      this.defaultKeys = [] // 需要重新将默认选中的权限置空，否则defaultKeys[]中的id越来越多
     }
   }
 }
