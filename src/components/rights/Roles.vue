@@ -44,7 +44,7 @@
         <el-table-column label="操作" align="center">
           <template v-slot="scope">
             <el-button type="primary" size="mini" icon="el-icon-edit" @click="editRole(scope.row.id)">编辑</el-button>
-            <el-button type="danger" size="mini" icon="el-icon-delete">删除</el-button>
+            <el-button type="danger" size="mini" icon="el-icon-delete" @click="delRole(scope.row.id)">删除</el-button>
             <el-button type="warning" size="mini" icon="el-icon-setting" @click="giveRight(scope.row)">分配权限</el-button>
           </template>
         </el-table-column>
@@ -262,6 +262,22 @@ export default {
     // 修改角色对话框关闭
     editDialogClose() {
       this.$refs.editRoleFormRef.resetFields()
+    },
+    // 删除角色
+    async delRole(roleId) {
+      const confirmRes = await this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (confirmRes === 'cancel') return this.$message.info('已取消删除')
+      const res = await this.$http.delete(`roles/${roleId}`)
+      if (res.data.meta.status === 200) {
+        this.$message.success('删除成功')
+        this.getRolesList()
+      } else {
+        this.$message.error('删除失败,' + res.data.meta.msg)
+      }
     }
   }
 }
