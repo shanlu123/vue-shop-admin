@@ -64,17 +64,17 @@
       </el-dialog>
       <!-- 表格 -->
       <el-table :data="userList" stripe  style="width: 100%" border class="table" size="mini" >
-        <el-table-column type="index" label="#" width="50"></el-table-column>
-        <el-table-column prop="username" label="姓名" width="180"></el-table-column>
-        <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
-        <el-table-column prop="mobile" label="电话" width="180"></el-table-column>
-        <el-table-column prop="role_name" label="角色" width="180"></el-table-column>
-        <el-table-column label="状态" width="180">
+        <el-table-column align="center" type="index" label="#" width="50"></el-table-column>
+        <el-table-column align="center" prop="username" label="姓名" width="180"></el-table-column>
+        <el-table-column align="center" prop="email" label="邮箱" width="180"></el-table-column>
+        <el-table-column align="center" prop="mobile" label="电话" width="180"></el-table-column>
+        <el-table-column align="center" prop="role_name" label="角色" width="180"></el-table-column>
+        <el-table-column align="center" label="状态" width="180">
           <template v-slot="scope">
             <el-switch v-model="scope.row.mg_state" @change="mgStateChange(scope.row)"></el-switch>
           </template>
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" align="center">
           <template v-slot="scope">
             <el-button type="primary" size="mini" icon="el-icon-edit" @click="edit(scope.row.id)"></el-button>
             <el-button type="danger" size="mini" icon="el-icon-delete" @click="delUser(scope.row.id)"></el-button>
