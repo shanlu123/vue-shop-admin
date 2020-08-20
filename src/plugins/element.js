@@ -3,6 +3,7 @@ import {
   Button, Form, FormItem, Input, Message, Header, Container, Main, Aside, Row, Col, Avatar,
   Menu, Submenu, MenuItem, MenuItemGroup, Breadcrumb, BreadcrumbItem, Card, Table, TableColumn,
   Tag, Switch, Pagination, Tooltip, Dialog, MessageBox
+} from 'element-ui'
 
 Vue.use(Button)
 Vue.use(Input)
