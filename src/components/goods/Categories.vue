@@ -9,35 +9,35 @@
     <!-- 卡片视图 -->
     <el-card class="box-card" shadow="always">
       <!-- 添加分类 -->
-      <el-button class="btn-add" type="primary">添加分类</el-button>
+      <el-button class="btn-add" type="primary" @click="addCate">添加分类</el-button>
       <!-- 表格 -->
       <tree-table
-      index-text="#"
-      :data="categoriesList"
-      :columns="columns"
-      stripe
-      border
-      show-row-hover
-      show-index
-      tree-type
-      is-fold
-      :expand-type="false"
-      :selection-type="false"
-      class="table"
+        index-text="#"
+        :data="categoriesList"
+        :columns="columns"
+        stripe
+        border
+        show-row-hover
+        show-index
+        tree-type
+        is-fold
+        :expand-type="false"
+        :selection-type="false"
+        class="table"
       >
-      <template v-slot:isuse="scope">  <!-- <template #isuse="scope"> 这两种方式都可以将两个属性写一起-->
+        <template v-slot:isuse="scope">  <!-- <template #isuse="scope"> 这两种方式都可以将两个属性写一起-->
         <i v-if="!scope.row.cat_deleted" style="color:green"  class="el-icon-success"></i>
         <i v-if="scope.row.cat_deleted"  style="color:red"  class="el-icon-error" ></i>
-      </template>
-      <template slot="level" scope="scope">
+        </template>
+        <template slot="level" scope="scope">
         <el-tag size="mini" v-if="scope.row.cat_level === 0">一级</el-tag>
         <el-tag size="mini" type="success" v-if="scope.row.cat_level === 1">二级</el-tag>
         <el-tag size="mini" type="warning" v-if="scope.row.cat_level === 2">三级</el-tag>
-      </template>
-      <template slot="operate">
+        </template>
+        <template slot="operate">
         <el-button size="mini" type="primary" icon="el-icon-edit">编辑</el-button>
         <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
-      </template>
+        </template>
       </tree-table>
       <!-- 分页 -->
       <el-pagination
@@ -51,6 +51,29 @@
             >
       </el-pagination>
     </el-card>
+    <!-- 添加分类对话框 -->
+    <el-dialog
+        title="添加分类"
+        :visible.sync="addCateVisible"
+        width="50%">
+        <el-form ref="addCateFormRef" :model="addCateForm" label-width="80px" :rules="addCateFormRules">
+            <el-form-item label="分类名称" prop="cat_name">
+              <el-input v-model="addCateForm.cat_name"></el-input>
+            </el-form-item>
+            <el-form-item label="父级分类">
+                 <el-cascader
+                    :model="selectKeys"
+                    :options="parentCateList"
+                    :props="cascaderProps"
+                    @change="handleChange">
+                </el-cascader>
+            </el-form-item>
+        </el-form>
+        <span slot="footer">
+          <el-button @click="addCateVisible = false">取 消</el-button>
+          <el-button type="primary" @click="addCateVisible = false">确 定</el-button>
+        </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -92,7 +115,23 @@ export default {
         headerAlign: 'center',
         type: 'template',
         template: 'operate'
-      }]
+      }],
+      addCateVisible: false, // 添加分离对话框显示与隐藏
+      addCateForm: { // 添加分类表单数据
+        cat_name: '', // 分类名称
+        cat_pid: '', // 分类父ID
+        cat_level: '' // 分类层级
+      },
+      addCateFormRules: {
+        cat_name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
+      },
+      parentCateList: [], // 父级分类列表（级联选择中）
+      cascaderProps: { // 指定级联选择器的具体配置对象
+        value: 'cat_id', // 真正选中的值
+        label: 'cat_name', // 看到的文本选项
+        children: 'children' // 渲染子属性
+      },
+      selectKeys: [] // 选中的父级分类的id数组
     }
   },
   created() {
@@ -117,11 +156,20 @@ export default {
     handleCurrentChange(curPageNum) {
       this.queryParams.pagenum = curPageNum
       this.getCategoriesList()
-    }
+    },
+    // 点击添加分类
+    async addCate() {
+      const res = await this.$http('categories', { params: { type: 2 } })
+      if (res.data.meta.status !== 200) return this.$http.error('获取父级分类列表失败,' + res.data.meta.msg)
+      this.parentCateList = res.data.data
+      this.addCateVisible = true
+    },
+    // 监听父级分类级联选择
+    handleChange() {}
   }
 }
 </script>
-<style scoped>
+<style>
 .box-card {
   margin-top: 20px;
   padding: 0;
@@ -129,7 +177,12 @@ export default {
 .btn-add {
   margin-bottom: 20px;
 }
-  .table {
-    margin-bottom: 20px;
-  }
+.table {
+  margin-bottom: 20px;
+  margin-top:20px;
+}
+/* 级联选择的高度 */
+.el-cascader-panel {
+    height:200px;
+}
 </style>
