@@ -55,23 +55,25 @@
     <el-dialog
         title="添加分类"
         :visible.sync="addCateVisible"
-        width="50%">
+        width="50%"
+        @close="addCateClose">
         <el-form ref="addCateFormRef" :model="addCateForm" label-width="80px" :rules="addCateFormRules">
             <el-form-item label="分类名称" prop="cat_name">
               <el-input v-model="addCateForm.cat_name"></el-input>
             </el-form-item>
             <el-form-item label="父级分类">
                  <el-cascader
-                    :model="selectKeys"
+                    v-model="selectKeys"
                     :options="parentCateList"
                     :props="cascaderProps"
-                    @change="handleChange">
+                    @change="parentCateChange"
+                    clearable>
                 </el-cascader>
             </el-form-item>
         </el-form>
         <span slot="footer">
           <el-button @click="addCateVisible = false">取 消</el-button>
-          <el-button type="primary" @click="addCateVisible = false">确 定</el-button>
+          <el-button type="primary" @click="addCateSubmit">确 定</el-button>
         </span>
     </el-dialog>
   </div>
@@ -119,8 +121,8 @@ export default {
       addCateVisible: false, // 添加分离对话框显示与隐藏
       addCateForm: { // 添加分类表单数据
         cat_name: '', // 分类名称
-        cat_pid: '', // 分类父ID
-        cat_level: '' // 分类层级
+        cat_pid: 0, // 父级分类的id,一级分类的父级id是0
+        cat_level: 0 // 分类层级，默认归为一级分类
       },
       addCateFormRules: {
         cat_name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
@@ -129,9 +131,11 @@ export default {
       cascaderProps: { // 指定级联选择器的具体配置对象
         value: 'cat_id', // 真正选中的值
         label: 'cat_name', // 看到的文本选项
-        children: 'children' // 渲染子属性
+        children: 'children', // 渲染子属性
+        expandTrigger: 'hover',
+        checkStrictly: true // 可以选择任意一级,解除父子节点互相关联
       },
-      selectKeys: [] // 选中的父级分类的id数组
+      selectKeys: []// 选中的父级分类的id数组
     }
   },
   created() {
@@ -164,8 +168,41 @@ export default {
       this.parentCateList = res.data.data
       this.addCateVisible = true
     },
-    // 监听父级分类级联选择
-    handleChange() {}
+    // 监听父级分类级联选择,组件添加分类提交参数
+    parentCateChange() {
+      // console.log(this.selectKeys)
+      if (this.selectKeys.length === 0) { // 父级ID没有
+        this.addCateForm.cat_level = 0 // 一级分类
+        this.addCateForm.cat_pid = 0
+      }
+      if (this.selectKeys.length === 1) { // 父级ID有一个
+        this.addCateForm.cat_level = 1 // 二级分类
+        this.addCateForm.cat_pid = this.selectKeys[0]
+      }
+      if (this.selectKeys.length === 2) { // 父级ID 有两个
+        this.addCateForm.cat_level = 2 // 三级分类
+        this.addCateForm.cat_pid = this.selectKeys[1]
+      }
+    },
+    // 添加分类提交
+    addCateSubmit() {
+      this.$refs.addCateFormRef.validate(async valid => {
+        if (!valid) return
+        const res = await this.$http.post('categories', this.addCateForm)
+        if (res.data.meta.status === 201) {
+          this.$message.success('添加分类成功')
+          this.getCategoriesList()
+        } else {
+          this.$message.error('添加分类失败,' + res.data.meta.msg)
+        }
+        this.addCateVisible = false
+      })
+    },
+    // 监听添加分类对话框关闭
+    addCateClose() {
+      this.addCateForm = {}
+      this.selectKeys = []
+    }
   }
 }
 </script>
