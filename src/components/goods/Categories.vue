@@ -200,8 +200,9 @@ export default {
     },
     // 监听添加分类对话框关闭
     addCateClose() {
-      this.addCateForm = {}
-      this.selectKeys = []
+      this.$refs.addCateFormRef.resetFields() // 分类名称可以被清除
+      // this.addCateForm = {}
+      this.selectKeys = [] // 父级分类选项可以被selectKeys清除
     }
   }
 }
