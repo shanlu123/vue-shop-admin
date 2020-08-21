@@ -62,6 +62,30 @@
           <el-button type="primary" @click="editSubmit">确 定</el-button>
         </span>
       </el-dialog>
+      <!-- 分配角色对话框 -->
+      <el-dialog
+          title="分配角色"
+          :visible.sync="giveRoleVisible"
+          width="30%"
+          @close="giveRoleDialogClose">
+          <el-form  label-width="100px">
+            <el-form-item label="当前用户">
+              <el-input :value="curUser.username" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="当前角色">
+              <el-input :value="curUser.role_name" disabled></el-input>
+            </el-form-item>
+            <el-form-item label="分配新角色">
+               <el-select placeholder="请选择" v-model="curSelectRoleId">
+                 <el-option v-for="role in curUserRoles" :key="role.id" :label="role.roleName" :value="role.id"></el-option>
+               </el-select>
+            </el-form-item>
+          </el-form>
+          <span slot="footer">
+            <el-button @click="giveRoleVisible = false">取 消</el-button>
+            <el-button type="primary" @click="giveRoleSubmit">确 定</el-button>
+          </span>
+      </el-dialog>
       <!-- 表格 -->
       <el-table :data="userList" stripe  style="width: 100%" border class="table" size="mini" >
         <el-table-column align="center" type="index" label="#" width="50"></el-table-column>
@@ -79,7 +103,7 @@
             <el-button type="primary" size="mini" icon="el-icon-edit" @click="edit(scope.row.id)"></el-button>
             <el-button type="danger" size="mini" icon="el-icon-delete" @click="delUser(scope.row.id)"></el-button>
             <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
-                <el-button type="warning" size="mini" icon="el-icon-setting"></el-button>
+                <el-button type="warning" size="mini" icon="el-icon-setting" @click="giveRole(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -162,7 +186,11 @@ export default {
           { required: true, message: '请输入手机号码', trigger: 'blur' },
           { validator: checkMobile, trigger: 'blur' }
         ]
-      }
+      },
+      giveRoleVisible: false, // 分配角色对话框显示与隐藏
+      curUser: {}, // 当前要分配角色的用户对象
+      curUserRoles: [], // 当前要分配角色的用户的角色列表
+      curSelectRoleId: '' // 当前选择要分配的角色id
     }
   },
   created() {
@@ -269,6 +297,33 @@ export default {
       } else {
         this.$message.error('删除失败:' + res.data.meta.msg)
       }
+    },
+    // 点击分配角色
+    async giveRole(curUser) {
+      this.curUser = curUser // 保存当前要分配角色的用户
+      const res = await this.$http.get('roles')
+      if (res.data.meta.status !== 200) return this.$message.error('获取角色列表失败,' + res.data.meta.msg)
+      this.curUserRoles = res.data.data
+      this.giveRoleVisible = true
+    },
+    // 分配角色完成提交
+    async giveRoleSubmit() {
+      if (this.curSelectRoleId === '') return this.$message.warning('请选择角色')
+      const res = await this.$http.put(`users/${this.curUser.id}/role`, {
+        rid: this.curSelectRoleId
+      })
+      if (res.data.meta.status !== 200) {
+        this.$message.error('分配角色失败,' + res.data.meta.msg)
+      } else {
+        this.$message.success('分配角色成功')
+        this.getUserList()
+      }
+      this.giveRoleVisible = false
+    },
+    // 分配角色对话框关闭
+    giveRoleDialogClose() {
+      this.curSelectRoleId = ''
+      this.curUser = ''
     }
   }
 }
