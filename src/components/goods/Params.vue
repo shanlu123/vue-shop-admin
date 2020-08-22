@@ -32,14 +32,14 @@
                    <template v-slot="scope">
                        <el-tag closable :type="tagType[index%4]" v-for="(item,index) in scope.row.attr_vals" :key="index">{{item}}</el-tag>
                         <el-input
-                           v-if="inputVisible"
-                           v-model="inputValue"
+                           v-if="scope.row.inputVisible"
+                           v-model="scope.row.inputValue"
                            size="small"
-                           @keyup.enter.native="handleInputConfirm"
-                           @blur="handleInputConfirm"
+                           @keyup.enter.native="handleInputConfirm(scope.row)"
+                           @blur="handleInputConfirm(scope.row)"
                            class="input-new-tag">
                         </el-input>
-                        <el-button v-else size="small" @click="showInput">+ New Tag</el-button>
+                        <el-button v-else size="small" @click="showInput(scope.row)">+ New Tag</el-button>
                    </template>
                </el-table-column>
                <el-table-column label="#" type="index" width="280" align="center"></el-table-column>
@@ -182,17 +182,15 @@ export default {
     // 获取表格数据
     async getTableData() {
       const res = await this.$http.get(`categories/${this.selectCatId}/attributes`, { params: { sel: this.curTabName } })
+      if (res.data.meta.status !== 200) return this.$message.error('获取表格数据失败,' + res.data.meta.msg)
+      for (let i = 0; i < res.data.data.length; i++) {
+        res.data.data[i].attr_vals = res.data.data[i].attr_vals ? res.data.data[i].attr_vals.split(',') : [] // 解决attr_vals中某一项为空页面标签上显示0的bug
+        res.data.data[i].inputVisible = false // 为每一行单独提供inputVisible切换展开列的按钮和输入框
+        res.data.data[i].inputValue = '' // 为每一行单独提供inputValue监听展开列中输入框的值
+      }
       if (this.curTabName === 'many') {
-        if (res.data.meta.status !== 200) return this.$message.error('获取动态参数失败,' + res.data.meta.msg)
-        for (let i = 0; i < res.data.data.length; i++) {
-          res.data.data[i].attr_vals = res.data.data[i].attr_vals ? res.data.data[i].attr_vals.split(',') : [] // 解决attr_vals中某一项为空页面标签上显示0的bug
-        }
         this.dynamicParams = res.data.data
       } else if (this.curTabName === 'only') {
-        if (res.data.meta.status !== 200) return this.$message.error('获取静态属性失败,' + res.data.meta.msg)
-        for (let i = 0; i < res.data.data.length; i++) {
-          res.data.data[i].attr_vals = res.data.data[i].attr_vals ? res.data.data[i].attr_vals.split(',') : []
-        }
         this.staticAttrs = res.data.data
       }
     },
@@ -271,12 +269,12 @@ export default {
       }
     },
     // 展开列中输入框输入回车或者失去焦点
-    handleInputConfirm() {
-      this.inputVisible = false // 切换到显示按钮
+    handleInputConfirm(curRow) {
+      curRow.inputVisible = false // 切换到显示按钮
     },
     // 展开列中点击添加按钮出现输入框
-    showInput() {
-      this.inputVisible = true // 显示输入框
+    showInput(curRow) {
+      curRow.inputVisible = true // 显示输入框
     }
   }
 }
