@@ -157,7 +157,7 @@ export default {
         checkStrictly: true // 可以选择任意一级,解除父子节点互相关联
       },
       selectKeys: [], // 选中的父级分类的id数组
-      curCate: {} // 当前要修改的分类id
+      curCate: {} // 当前要修改的分类
     }
   },
   created() {

@@ -2,7 +2,7 @@ import Vue from 'vue'
 import {
   Button, Form, FormItem, Input, Message, Header, Container, Main, Aside, Row, Col, Avatar,
   Menu, Submenu, MenuItem, MenuItemGroup, Breadcrumb, BreadcrumbItem, Card, Table, TableColumn,
-  Tag, Switch, Pagination, Tooltip, Dialog, MessageBox, Select, Option, Tree, Cascader
+  Tag, Switch, Pagination, Tooltip, Dialog, MessageBox, Select, Option, Tree, Cascader, Alert, Tabs, TabPane
 } from 'element-ui'
 
 Vue.use(Button)
@@ -34,5 +34,8 @@ Vue.use(Select)
 Vue.use(Option)
 Vue.use(Tree)
 Vue.use(Cascader)
+Vue.use(Alert)
+Vue.use(Tabs)
+Vue.use(TabPane)
 Vue.prototype.$message = Message // Message需要挂载到原型上使用
 Vue.prototype.$confirm = MessageBox.confirm
