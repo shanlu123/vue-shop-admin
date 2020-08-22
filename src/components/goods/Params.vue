@@ -35,6 +35,7 @@
                            v-if="scope.row.inputVisible"
                            v-model="scope.row.inputValue"
                            size="small"
+                           ref="saveTagInput"
                            @keyup.enter.native="handleInputConfirm(scope.row)"
                            @blur="handleInputConfirm(scope.row)"
                            class="input-new-tag">
@@ -132,9 +133,7 @@ export default {
         attr_name: [{ required: true, message: '请输入参数名称', trigger: 'blur' }]
       },
       curAttrId: '', // 当前要修改的属性id
-      tagType: ['', 'success', 'danger', 'warning'],
-      inputVisible: false, // 控制展开列中按钮与输入框的切换显示
-      inputValue: '' // 监听展开列中输入值
+      tagType: ['', 'success', 'danger', 'warning']
     }
   },
   computed: {
@@ -268,13 +267,33 @@ export default {
         this.$message.error('删除失败,' + res.data.meta.msg)
       }
     },
-    // 展开列中输入框输入回车或者失去焦点
-    handleInputConfirm(curRow) {
+    // 展开列中输入框回车或者失去焦点
+    async handleInputConfirm(curRow) {
+      if (curRow.inputValue.trim().length === 0) return
+      // 输入合法下
+      curRow.attr_vals.push(curRow.inputValue.trim())
       curRow.inputVisible = false // 切换到显示按钮
+      curRow.inputValue = '' // 将这一行的inputValue立即清空
+      // 发请求添加
+      const reqParams = {
+        attr_name: curRow.attr_name,
+        attr_sel: this.curTabName,
+        attr_vals: curRow.attr_vals.join(',')
+      }
+      const res = await this.$http.put(`categories/${this.selectCatId}/attributes/${curRow.attr_id}`, reqParams)
+      if (res.data.meta.status === 200) {
+        this.$message.success('添加属性值成功')
+      } else {
+        this.$message.error('添加属性值失败,' + res.data.meta.msg)
+        curRow.attr_vals.pop()
+      }
     },
     // 展开列中点击添加按钮出现输入框
     showInput(curRow) {
       curRow.inputVisible = true // 显示输入框
+      this.$nextTick(_ => { // 让文本框自动获得焦点  $nextTick是页面被重新渲染后(输入框被重新显示了)才调用里面的获得焦点的代码
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
     }
   }
 }
