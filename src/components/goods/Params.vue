@@ -28,7 +28,22 @@
             <el-button class="margin-bottom" size="mini" type="primary" :disabled="!selectCatId" @click="addClick">添加参数</el-button>
              <!-- 动态参数表格 -->
             <el-table :data="dynamicParams" style="width: 100%" size="mini" stripe border>
-               <el-table-column  type="expand" width="100" align="center"></el-table-column>
+               <el-table-column  type="expand" width="100" align="center">
+                   <template v-slot="scope">
+                       <el-tag closable :type="tagType[index%4]" v-for="(item,index) in scope.row.attr_vals" :key="index">{{item}}</el-tag>
+                        <el-input
+                           v-if="inputVisible"
+                           v-model="inputValue"
+                           size="small"
+                           @keyup.enter.native="handleInputConfirm"
+                           @blur="handleInputConfirm"
+                           class="input-new-tag"
+                        >
+                        </el-input>
+                        <el-button v-else size="small" @click="showInput">+ New Tag</el-button>
+
+                   </template>
+               </el-table-column>
                <el-table-column label="#" type="index" width="280" align="center"></el-table-column>
                <el-table-column prop="attr_name" label="参数名称" width="280" align="center">
                </el-table-column>
@@ -117,7 +132,10 @@ export default {
       FormRules: { // 表单验证规则
         attr_name: [{ required: true, message: '请输入参数名称', trigger: 'blur' }]
       },
-      curAttrId: '' // 当前要修改的属性id
+      curAttrId: '', // 当前要修改的属性id
+      tagType: ['', 'success', 'danger', 'warning'],
+      inputVisible: false, // 控制展开列中按钮与输入框的切换显示
+      inputValue: '' // 监听展开列中输入值
     }
   },
   computed: {
@@ -167,9 +185,15 @@ export default {
       const res = await this.$http.get(`categories/${this.selectCatId}/attributes`, { params: { sel: this.curTabName } })
       if (this.curTabName === 'many') {
         if (res.data.meta.status !== 200) return this.$message.error('获取动态参数失败,' + res.data.meta.msg)
+        for (let i = 0; i < res.data.data.length; i++) {
+          res.data.data[i].attr_vals = res.data.data[i].attr_vals.split(',')
+        }
         this.dynamicParams = res.data.data
       } else if (this.curTabName === 'only') {
         if (res.data.meta.status !== 200) return this.$message.error('获取静态属性失败,' + res.data.meta.msg)
+        for (let i = 0; i < res.data.data.length; i++) {
+          res.data.data[i].attr_vals = res.data.data[i].attr_vals.split(',')
+        }
         this.staticAttrs = res.data.data
       }
     },
@@ -246,6 +270,14 @@ export default {
       } else {
         this.$message.error('删除失败,' + res.data.meta.msg)
       }
+    },
+    // 展开列中输入框输入回车或者失去焦点
+    handleInputConfirm() {
+      this.inputVisible = false // 切换到显示按钮
+    },
+    // 展开列中点击添加按钮出现输入框
+    showInput() {
+      this.inputVisible = true // 显示输入框
     }
   }
 }
@@ -260,5 +292,12 @@ export default {
 }
 .margin-bottom{
     margin-bottom:20px;
+}
+.el-tag{
+    margin:5px;
+}
+.input-new-tag{
+    width: 90px;
+    margin:5px;
 }
 </style>
