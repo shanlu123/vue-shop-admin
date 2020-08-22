@@ -37,11 +37,9 @@
                            size="small"
                            @keyup.enter.native="handleInputConfirm"
                            @blur="handleInputConfirm"
-                           class="input-new-tag"
-                        >
+                           class="input-new-tag">
                         </el-input>
                         <el-button v-else size="small" @click="showInput">+ New Tag</el-button>
-
                    </template>
                </el-table-column>
                <el-table-column label="#" type="index" width="280" align="center"></el-table-column>
@@ -60,7 +58,8 @@
             <el-button class="margin-bottom" size="mini" type="primary" :disabled="!selectCatId" @click="addClick">添加属性</el-button>
             <!-- 静态属性表格 -->
             <el-table :data="staticAttrs" style="width: 100%" size="mini" stripe border>
-                <el-table-column  type="expand" width="100" align="center"></el-table-column>
+                <el-table-column  type="expand" width="100" align="center">
+                </el-table-column>
                 <el-table-column label="#" type="index" width="280" align="center"></el-table-column>
                 <el-table-column prop="attr_name" label="属性名称" width="280" align="center">
                 </el-table-column>
@@ -186,13 +185,13 @@ export default {
       if (this.curTabName === 'many') {
         if (res.data.meta.status !== 200) return this.$message.error('获取动态参数失败,' + res.data.meta.msg)
         for (let i = 0; i < res.data.data.length; i++) {
-          res.data.data[i].attr_vals = res.data.data[i].attr_vals.split(',')
+          res.data.data[i].attr_vals = res.data.data[i].attr_vals ? res.data.data[i].attr_vals.split(',') : [] // 解决attr_vals中某一项为空页面标签上显示0的bug
         }
         this.dynamicParams = res.data.data
       } else if (this.curTabName === 'only') {
         if (res.data.meta.status !== 200) return this.$message.error('获取静态属性失败,' + res.data.meta.msg)
         for (let i = 0; i < res.data.data.length; i++) {
-          res.data.data[i].attr_vals = res.data.data[i].attr_vals.split(',')
+          res.data.data[i].attr_vals = res.data.data[i].attr_vals ? res.data.data[i].attr_vals.split(',') : []
         }
         this.staticAttrs = res.data.data
       }
