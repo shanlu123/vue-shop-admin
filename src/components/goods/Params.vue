@@ -25,7 +25,7 @@
       <el-tabs v-model="curTabName" @tab-click="tabClick">
         <el-tab-pane label="动态参数" name="many">
             <!-- 添加参数 -->
-            <el-button class="margin-bottom" size="mini" type="primary" :disabled="!selectCatId">添加参数</el-button>
+            <el-button class="margin-bottom" size="mini" type="primary" :disabled="!selectCatId" @click="addClick">添加参数</el-button>
              <!-- 动态参数表格 -->
             <el-table :data="dynamicParams" style="width: 100%" size="mini" stripe border>
                <el-table-column  type="expand" width="100" align="center"></el-table-column>
@@ -42,7 +42,7 @@
         </el-tab-pane>
         <el-tab-pane label="静态属性" name="only">
             <!-- 添加属性 -->
-            <el-button class="margin-bottom" size="mini" type="primary" :disabled="!selectCatId">添加属性</el-button>
+            <el-button class="margin-bottom" size="mini" type="primary" :disabled="!selectCatId" @click="addClick">添加属性</el-button>
             <!-- 静态属性表格 -->
             <el-table :data="staticAttrs" style="width: 100%" size="mini" stripe border>
                 <el-table-column  type="expand" width="100" align="center"></el-table-column>
@@ -59,6 +59,22 @@
         </el-tab-pane>
      </el-tabs>
     </el-card>
+    <!-- 添加对话框 -->
+    <el-dialog
+      :title="'添加'+DialogTitle"
+      :visible.sync="dialogVisible"
+      width="50%"
+      @close="DialogClose">
+      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px">
+        <el-form-item :label="DialogTitle" prop="attrName">
+          <el-input v-model="addForm.attrName"></el-input>
+        </el-form-item>
+       </el-form>
+      <span slot="footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="DialogSubmit">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -75,14 +91,28 @@ export default {
       },
       curTabName: 'many', // 当前tab名
       dynamicParams: [], // 动态参数
-      staticAttrs: [] // 静态属性
+      staticAttrs: [], // 静态属性
+      dialogVisible: false, // 对话框显示与隐藏
+      addForm: { // 添加表单数据
+        attrName: ''
+      },
+      addFormRules: {
+        attrName: [{ required: true, message: '请输入参数名称', trigger: 'blur' }]
+      }
     }
   },
   computed: {
-    selectCatId() { // 选择的分类id
+    // 选择的分类id
+    selectCatId() {
       if (this.selectKeys.length > 0) {
         return this.selectKeys[this.selectKeys.length - 1] // 最后一个分类的id就是所选中的分类id
       }
+      return null
+    },
+    // 对话框标题
+    DialogTitle() {
+      if (this.curTabName === 'many') return '动态参数'
+      if (this.curTabName === 'only') return '静态属性'
       return null
     }
   },
@@ -123,6 +153,32 @@ export default {
         if (res.data.meta.status !== 200) return this.$message.error('获取静态属性失败,' + res.data.meta.msg)
         this.staticAttrs = res.data.data
       }
+    },
+    // 点击添加按钮
+    addClick() {
+      this.dialogVisible = true
+    },
+    // 监听对话框关闭
+    DialogClose() {
+      this.$refs.addFormRef.resetFields()
+    },
+    // 对话框中表单提交
+    DialogSubmit() {
+      this.$refs.addFormRef.validate(async valid => {
+        if (!valid) return
+        const postParams = {
+          attr_name: this.addForm.attrName,
+          attr_sel: this.curTabName
+        }
+        const res = await this.$http.post(`categories/${this.selectCatId}/attributes`, postParams)
+        if (res.data.meta.status === 201) {
+          this.$message.success('添加成功')
+          this.getTableData()
+        } else {
+          this.$message.error('添加失败,' + res.data.meta.msg)
+        }
+        this.dialogVisible = false
+      })
     }
   }
 }
