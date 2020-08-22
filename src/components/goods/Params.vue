@@ -60,6 +60,19 @@
             <!-- 静态属性表格 -->
             <el-table :data="staticAttrs" style="width: 100%" size="mini" stripe border>
                 <el-table-column  type="expand" width="100" align="center">
+                   <template v-slot="scope">
+                       <el-tag closable :type="tagType[index%4]" v-for="(item,index) in scope.row.attr_vals" :key="index" @close="delVal(index,scope.row)">{{item}}</el-tag>
+                        <el-input
+                           v-if="scope.row.inputVisible"
+                           v-model="scope.row.inputValue"
+                           size="small"
+                           ref="saveTagInput"
+                           @keyup.enter.native="handleInputConfirm(scope.row)"
+                           @blur="handleInputConfirm(scope.row)"
+                           class="input-new-tag">
+                        </el-input>
+                        <el-button v-else size="small" @click="showInput(scope.row)">+ New Tag</el-button>
+                   </template>
                 </el-table-column>
                 <el-table-column label="#" type="index" width="280" align="center"></el-table-column>
                 <el-table-column prop="attr_name" label="属性名称" width="280" align="center">
