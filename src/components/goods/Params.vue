@@ -35,7 +35,7 @@
                <el-table-column label="操作" align="center">
                  <template v-slot="scope">
                      <el-button size="mini" type="primary" icon="el-icon-edit" @click="editClick(scope.row.attr_id)">修改</el-button>
-                     <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
+                     <el-button size="mini" type="danger" icon="el-icon-delete" @click="delClick(scope.row.attr_id)">删除</el-button>
                  </template>
                </el-table-column>
             </el-table>
@@ -52,7 +52,7 @@
                 <el-table-column label="操作" align="center">
                   <template v-slot="scope">
                       <el-button size="mini" type="primary" icon="el-icon-edit" @click="editClick(scope.row.attr_id)">修改</el-button>
-                      <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
+                      <el-button size="mini" type="danger" icon="el-icon-delete" @click="delClick(scope.row.attr_id)">删除</el-button>
                   </template>
                 </el-table-column>
             </el-table>
@@ -230,6 +230,22 @@ export default {
         }
         this.editDialogVisible = false
       })
+    },
+    // 点击删除按钮
+    async delClick(attrId) {
+      const confirmRes = await this.$confirm('此操作将永久删除该参数, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (confirmRes === 'cancel') return this.$message.info('已取消删除')
+      const res = await this.$http.delete(`categories/${this.selectCatId}/attributes/${attrId}`)
+      if (res.data.meta.status === 200) {
+        this.$message.success('删除成功')
+        this.getTableData()
+      } else {
+        this.$message.error('删除失败,' + res.data.meta.msg)
+      }
     }
   }
 }
