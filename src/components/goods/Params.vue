@@ -33,8 +33,8 @@
                <el-table-column prop="attr_name" label="参数名称" width="280" align="center">
                </el-table-column>
                <el-table-column label="操作" align="center">
-                 <template>
-                     <el-button size="mini" type="primary" icon="el-icon-edit">修改</el-button>
+                 <template v-slot="scope">
+                     <el-button size="mini" type="primary" icon="el-icon-edit" @click="editClick(scope.row.attr_id)">修改</el-button>
                      <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
                  </template>
                </el-table-column>
@@ -50,8 +50,8 @@
                 <el-table-column prop="attr_name" label="属性名称" width="280" align="center">
                 </el-table-column>
                 <el-table-column label="操作" align="center">
-                  <template>
-                      <el-button size="mini" type="primary" icon="el-icon-edit">修改</el-button>
+                  <template v-slot="scope">
+                      <el-button size="mini" type="primary" icon="el-icon-edit" @click="editClick(scope.row.attr_id)">修改</el-button>
                       <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
                   </template>
                 </el-table-column>
@@ -62,17 +62,33 @@
     <!-- 添加对话框 -->
     <el-dialog
       :title="'添加'+DialogTitle"
-      :visible.sync="dialogVisible"
+      :visible.sync="addDialogVisible"
       width="50%"
-      @close="DialogClose">
-      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px">
-        <el-form-item :label="DialogTitle" prop="attrName">
-          <el-input v-model="addForm.attrName"></el-input>
+      @close="addDialogClose">
+      <el-form :model="addForm" :rules="FormRules" ref="addFormRef" label-width="100px">
+        <el-form-item :label="DialogTitle" prop="attr_name">
+          <el-input v-model="addForm.attr_name"></el-input>
         </el-form-item>
        </el-form>
       <span slot="footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="DialogSubmit">确 定</el-button>
+        <el-button @click="addDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addDialogSubmit">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 修改对话框 -->
+    <el-dialog
+      :title="'修改'+DialogTitle"
+      :visible.sync="editDialogVisible"
+      width="50%"
+      @close="editDialogClose">
+      <el-form :model="editForm" :rules="FormRules" ref="editFormRef" label-width="100px">
+        <el-form-item :label="DialogTitle" prop="attr_name">
+          <el-input v-model="editForm.attr_name"></el-input>
+        </el-form-item>
+       </el-form>
+      <span slot="footer">
+        <el-button @click="editDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editDialogSubmit">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -92,13 +108,16 @@ export default {
       curTabName: 'many', // 当前tab名
       dynamicParams: [], // 动态参数
       staticAttrs: [], // 静态属性
-      dialogVisible: false, // 对话框显示与隐藏
+      addDialogVisible: false, // 添加对话框显示与隐藏
+      editDialogVisible: false, // 修改对话框的显示与隐藏
       addForm: { // 添加表单数据
-        attrName: ''
+        attr_name: ''
       },
-      addFormRules: {
-        attrName: [{ required: true, message: '请输入参数名称', trigger: 'blur' }]
-      }
+      editForm: {}, // 编辑表单数据
+      FormRules: { // 表单验证规则
+        attr_name: [{ required: true, message: '请输入参数名称', trigger: 'blur' }]
+      },
+      curAttrId: '' // 当前要修改的属性id
     }
   },
   computed: {
@@ -156,18 +175,33 @@ export default {
     },
     // 点击添加按钮
     addClick() {
-      this.dialogVisible = true
+      this.addDialogVisible = true
     },
-    // 监听对话框关闭
-    DialogClose() {
+    // 点击修改按钮
+    async editClick(attrId) {
+      this.curAttrId = attrId
+      const res = await this.$http.get(`categories/${this.selectCatId}/attributes/${attrId}`, { params: { attr_sel: this.curTabName } })
+      if (res.data.meta.status === 200) {
+        this.editForm = res.data.data
+      } else {
+        this.$message.error('查询所要修改的属性信息失败,' + res.data.meta.msg)
+      }
+      this.editDialogVisible = true
+    },
+    // 监听添加对话框关闭
+    addDialogClose() {
       this.$refs.addFormRef.resetFields()
     },
-    // 对话框中表单提交
-    DialogSubmit() {
+    // 监听修改对话框关闭
+    editDialogClose() {
+      this.$refs.editFormRef.resetFields()
+    },
+    // 添加对话框中表单提交
+    addDialogSubmit() {
       this.$refs.addFormRef.validate(async valid => {
         if (!valid) return
         const postParams = {
-          attr_name: this.addForm.attrName,
+          attr_name: this.addForm.attr_name,
           attr_sel: this.curTabName
         }
         const res = await this.$http.post(`categories/${this.selectCatId}/attributes`, postParams)
@@ -177,7 +211,24 @@ export default {
         } else {
           this.$message.error('添加失败,' + res.data.meta.msg)
         }
-        this.dialogVisible = false
+        this.addDialogVisible = false
+      })
+    },
+    // 修改对话框中表单提交
+    editDialogSubmit() {
+      this.$refs.editFormRef.validate(async valid => {
+        if (!valid) return
+        const res = await this.$http.put(`categories/${this.selectCatId}/attributes/${this.curAttrId}`, {
+          attr_name: this.editForm.attr_name,
+          attr_sel: this.editForm.attr_sel
+        })
+        if (res.data.meta.status === 200) {
+          this.$message.success('修改成功')
+          this.getTableData()
+        } else {
+          this.$message.error('修改失败,' + res.data.meta.msg)
+        }
+        this.editDialogVisible = false
       })
     }
   }
