@@ -30,7 +30,7 @@
             <el-table :data="dynamicParams" style="width: 100%" size="mini" stripe border>
                <el-table-column  type="expand" width="100" align="center">
                    <template v-slot="scope">
-                       <el-tag closable :type="tagType[index%4]" v-for="(item,index) in scope.row.attr_vals" :key="index">{{item}}</el-tag>
+                       <el-tag closable :type="tagType[index%4]" v-for="(item,index) in scope.row.attr_vals" :key="index" @close="delVal(index,scope.row)">{{item}}</el-tag>
                         <el-input
                            v-if="scope.row.inputVisible"
                            v-model="scope.row.inputValue"
@@ -294,6 +294,21 @@ export default {
       this.$nextTick(_ => { // 让文本框自动获得焦点  $nextTick是页面被重新渲染后(输入框被重新显示了)才调用里面的获得焦点的代码
         this.$refs.saveTagInput.$refs.input.focus()
       })
+    },
+    // 删除属性值
+    async delVal(index, curRow) {
+      curRow.attr_vals.splice(index, 1)
+      const reqParams = {
+        attr_name: curRow.attr_name,
+        attr_sel: this.curTabName,
+        attr_vals: curRow.attr_vals.join(',')
+      }
+      const res = await this.$http.put(`categories/${this.selectCatId}/attributes/${curRow.attr_id}`, reqParams)
+      if (res.data.meta.status === 200) {
+        this.$message.success('删除成功')
+      } else {
+        this.$message.error('删除失败,' + res.data.meta.msg)
+      }
     }
   }
 }
