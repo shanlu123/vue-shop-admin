@@ -16,7 +16,7 @@
           </el-input>
         </el-col>
         <el-col :span="4"></el-col>
-        <el-button type="primary">添加商品</el-button>
+        <el-button type="primary" @click="toAddGood">添加商品</el-button>
       </el-row>
       <!-- 表格 -->
       <el-table :data="goodsList" style="width: 100%" size="mini" stripe border class="margin-top">
@@ -101,6 +101,10 @@ export default {
       } else {
         this.$message.error('删除失败,' + res.data.meta.msg)
       }
+    },
+    // 跳转到添加商品页面
+    toAddGood() {
+      this.$router.push('/home/goods/add')
     }
   }
 }
