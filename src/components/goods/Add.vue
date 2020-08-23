@@ -19,8 +19,32 @@
              <el-step title="完成"></el-step>
         </el-steps>
         <!-- tab区域 -->
-        <el-tabs tab-position="left" style="height: 200px;" v-model="activeProgress">
-            <el-tab-pane label="基本信息" name="0">基本信息</el-tab-pane>
+        <el-tabs tab-position="left" v-model="activeProgress">
+            <el-tab-pane label="基本信息" name="0">
+                <!-- 基本信息表单 -->
+                <el-form label-position="top" size="small" label-width="80px" :model="baseInfoForm" :rules="baseInfoFormRules">
+                    <el-form-item label="商品名称" prop="goods_name">
+                      <el-input v-model="baseInfoForm.goods_name"></el-input>
+                    </el-form-item>
+                    <el-form-item label="商品价格" prop="goods_price">
+                      <el-input v-model="baseInfoForm.goods_price" type="number"></el-input>
+                    </el-form-item>
+                    <el-form-item label="商品重量" prop="goods_weight">
+                      <el-input v-model="baseInfoForm.goods_weight" type="number"></el-input>
+                    </el-form-item>
+                    <el-form-item label="商品数量" prop="goods_number">
+                      <el-input v-model="baseInfoForm.goods_number" type="number"></el-input>
+                    </el-form-item>
+                    <el-form-item label="商品分类" prop="goods_cat">
+                      <el-cascader
+                          v-model="baseInfoForm.goods_cat"
+                          :options="goodCatList"
+                          :props="cascaderProps"
+                          @change="goodCatChange">
+                      </el-cascader>
+                    </el-form-item>
+                </el-form>
+            </el-tab-pane>
             <el-tab-pane label="商品参数" name="1">商品参数</el-tab-pane>
             <el-tab-pane label="商品属性" name="2">商品属性</el-tab-pane>
             <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
@@ -33,10 +57,47 @@
 export default {
   data: function() {
     return {
-      activeProgress: 0
+      activeProgress: 0, // 当前步骤
+      baseInfoForm: { // 基本信息表单数据
+        goods_name: '',
+        goods_price: '',
+        goods_weight: '',
+        goods_number: '',
+        goods_cat: ''
+      },
+      baseInfoFormRules: { // 基本信息表单验证规则
+        goods_name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
+        goods_price: [{ required: true, message: '请输入商品价格', trigger: 'blur' }],
+        goods_weight: [{ required: true, message: '请输入商品重量', trigger: 'blur' }],
+        goods_number: [{ required: true, message: '请输入商品数量', trigger: 'blur' }],
+        goods_cat: [{ required: true, message: '请选择商品分类', trigger: 'change' }]
+      },
+      goodCatList: [], // 基本信息中选择添加商品的分类
+      cascaderProps: { // 基本信息中级联选择器
+        value: 'cat_id',
+        label: 'cat_name',
+        children: 'children',
+        expandTrigger: 'hover'
+      }
     }
   },
+  created() {
+    this.getGoodCatList()
+  },
   methods: {
+    // 获取分类数据列表
+    async getGoodCatList() {
+      const res = await this.$http.get('categories')
+      if (res.data.meta.status === 200) {
+        this.goodCatList = res.data.data
+      } else {
+        this.$message.error('获取分类列表失败,' + res.data.meta.msg)
+      }
+    },
+    // 监听级联选择器中选择分类
+    goodCatChange() {
+      console.log(this.baseInfoForm.goods_cat)
+    }
   }
 }
 </script>
