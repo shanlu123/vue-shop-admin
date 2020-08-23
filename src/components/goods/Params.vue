@@ -7,7 +7,7 @@
       <el-breadcrumb-item>分类参数</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图 -->
-    <el-card class="box-card" shadow="always">
+    <el-card class="margin-top" shadow="always">
       <!-- 黄色警告 -->
       <el-alert title="注意：只允许为第三级分类设置相关参数！" type="warning" show-icon></el-alert>
       <!-- 级联选择器 -->
@@ -327,19 +327,6 @@ export default {
 }
 </script>
 <style scoped>
-.box-card {
-  margin-top: 20px;
-  padding: 0;
-}
-.margin-top{
-    margin-top:20px;
-}
-.margin-bottom{
-    margin-bottom:20px;
-}
-.el-tag{
-    margin:5px;
-}
 .input-new-tag{
     width: 90px;
     margin:5px;

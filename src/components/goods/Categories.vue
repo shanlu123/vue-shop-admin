@@ -7,9 +7,9 @@
       <el-breadcrumb-item>商品分类</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图 -->
-    <el-card class="box-card" shadow="always">
+    <el-card class="margin-top" shadow="always">
       <!-- 添加分类 -->
-      <el-button class="btn-add" type="primary" @click="addCate">添加分类</el-button>
+      <el-button type="primary" @click="addCate">添加分类</el-button>
       <!-- 表格 -->
       <tree-table
         index-text="#"
@@ -23,7 +23,7 @@
         is-fold
         :expand-type="false"
         :selection-type="false"
-        class="table"
+        class="margin-bottom margin-top"
       >
         <template v-slot:isuse="scope">  <!-- <template #isuse="scope"> 这两种方式都可以将两个属性写一起-->
         <i v-if="!scope.row.cat_deleted" style="color:green"  class="el-icon-success"></i>
@@ -276,17 +276,6 @@ export default {
 }
 </script>
 <style>
-.box-card {
-  margin-top: 20px;
-  padding: 0;
-}
-.btn-add {
-  margin-bottom: 20px;
-}
-.table {
-  margin-bottom: 20px;
-  margin-top:20px;
-}
 /* 级联选择的高度 */
 .el-cascader-panel {
     height:200px;

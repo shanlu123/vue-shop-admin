@@ -7,7 +7,7 @@
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图 -->
-    <el-card class="box-card" shadow="always">
+    <el-card class="margin-top" shadow="always">
       <!-- 搜索 -->
       <el-row :gutter="20">
         <el-col :span="8">
@@ -87,7 +87,7 @@
           </span>
       </el-dialog>
       <!-- 表格 -->
-      <el-table :data="userList" stripe  style="width: 100%" border class="table" size="mini" >
+      <el-table :data="userList" stripe  style="width: 100%" border class="margin-top margin-bottom" size="mini" >
         <el-table-column align="center" type="index" label="#" width="50"></el-table-column>
         <el-table-column align="center" prop="username" label="姓名" width="180"></el-table-column>
         <el-table-column align="center" prop="email" label="邮箱" width="180"></el-table-column>
@@ -331,19 +331,3 @@ export default {
   }
 }
 </script>
-<style scoped>
-  .box-card {
-    margin-top: 20px;
-    padding: 0;
-  }
-  .table {
-    margin-top: 20px;
-  }
-  .el-tag {
-    margin: 0 5px;
-    padding: 0 20px;
-  }
-  .el-pagination {
-    margin-top: 20px;
-  }
-</style>

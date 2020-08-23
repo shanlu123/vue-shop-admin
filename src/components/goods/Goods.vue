@@ -7,7 +7,7 @@
       <el-breadcrumb-item>商品列表</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图 -->
-    <el-card class="box-card" shadow="always">
+    <el-card shadow="always" class="margin-top">
       <!-- 搜索和添加 -->
       <el-row :gutter="20">
         <el-col :span="8">
@@ -89,15 +89,3 @@ export default {
   }
 }
 </script>
-<style scoped>
-.box-card {
-  margin-top: 20px;
-  padding: 0;
-}
-.margin-top {
-  margin-top: 20px;
-}
-.margin-bottom {
-  margin-bottom: 20px;
-}
-</style>

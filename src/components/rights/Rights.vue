@@ -7,7 +7,7 @@
       <el-breadcrumb-item>权限列表</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图 -->
-    <el-card class="box-card" shadow="always">
+    <el-card class="margin-top" shadow="always">
       <!-- 表格 -->
       <el-table
         :data="rightsList"
@@ -57,10 +57,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-.box-card {
-  margin-top: 20px;
-  padding: 0;
-}
-</style>

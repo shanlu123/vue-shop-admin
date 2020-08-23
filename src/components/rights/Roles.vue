@@ -7,10 +7,10 @@
       <el-breadcrumb-item>角色列表</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 卡片视图 -->
-    <el-card class="box-card" shadow="always">
-      <el-button class="btn-add" type="primary" @click="addDialogVisible=true">添加角色</el-button>
+    <el-card class="margin-top" shadow="always">
+      <el-button type="primary" @click="addDialogVisible=true">添加角色</el-button>
       <!-- 表格 -->
-      <el-table :data="rolesList" stripe border style="width:100%" size="small">
+      <el-table :data="rolesList" stripe border style="width:100%" size="small" class="margin-top">
         <!-- 展开列开始-->
         <el-table-column width="100" align="center" type="expand">
           <template v-slot="scope">
@@ -284,16 +284,6 @@ export default {
 </script>
 
 <style scoped>
-.box-card {
-  margin-top: 20px;
-  padding: 0;
-}
-.btn-add {
-  margin-bottom: 20px;
-}
-.el-tag {
-  margin: 5px;
-}
 .border-bottom {
   padding: 20px 0;
   border-bottom: 1px solid #eee;
