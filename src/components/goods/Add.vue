@@ -49,14 +49,20 @@
             <el-tab-pane label="商品参数" name="1">
               <!-- 商品参数表单 -->
               <el-form label-position="top" size="small" label-width="80px">
-                <el-form-item v-for="item in paramsList" :key="item.attr_id" :label="item.attr_name" >
+                <el-form-item v-for="item in dynamicParams" :key="item.attr_id" :label="item.attr_name" >
                   <el-checkbox-group v-model="item.attr_vals">
                     <el-checkbox v-for="(attrVal,index) in item.attr_vals" :key="index" :label="attrVal" name="type"></el-checkbox>
                   </el-checkbox-group>
                 </el-form-item>
               </el-form>
             </el-tab-pane>
-            <el-tab-pane label="商品属性" name="2">商品属性</el-tab-pane>
+            <el-tab-pane label="商品属性" name="2">
+              <el-form label-position="top" label-width="80px" size="mini" v-model="staticAttrs">
+                <el-form-item v-for="item in staticAttrs" :key="item.attr_id" :label="item.attr_name">
+                  <el-input v-model="item.attr_vals"></el-input>
+                </el-form-item>
+              </el-form>
+            </el-tab-pane>
             <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
             <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
         </el-tabs>
@@ -90,7 +96,15 @@ export default {
         expandTrigger: 'hover'
       },
       isValid: false, // 添加表单预校验是否通过
-      paramsList: [] // 商品参数列表
+      dynamicParams: [], // 商品动态参数列表
+      staticAttrs: [] // 商品静态属性列表
+    }
+  },
+  computed: {
+    curSel() {
+      if (this.activeProgress === '1') return 'many'
+      if (this.activeProgress === '2') return 'only'
+      return null
     }
   },
   created() {
@@ -133,22 +147,26 @@ export default {
         this.isValid = valid
       })
     },
-    // 获取商品参数面板信息
+    // 获取商品动态参数/静态属性面板信息
     async getParamsList() {
       const selectCatId = this.baseInfoForm.goods_cat[this.baseInfoForm.goods_cat.length - 1]
-      const res = await this.$http.get(`categories/${selectCatId}/attributes`, { params: { sel: 'many' } })
+      const res = await this.$http.get(`categories/${selectCatId}/attributes`, { params: { sel: this.curSel } })
       if (res.data.meta.status === 200) {
-        for (let i = 0; i < res.data.data.length; i++) {
-          res.data.data[i].attr_vals = res.data.data[i].attr_vals ? res.data.data[i].attr_vals.split(',') : []
+        if (this.curSel === 'many') { // 获取的是动态参数列表
+          for (let i = 0; i < res.data.data.length; i++) {
+            res.data.data[i].attr_vals = res.data.data[i].attr_vals ? res.data.data[i].attr_vals.split(',') : []
+          }
+          this.dynamicParams = res.data.data
+        } else { // 获取的是静态属性列表
+          this.staticAttrs = res.data.data
         }
-        this.paramsList = res.data.data
       } else {
-        this.$message.error('获取参数列表失败,' + res.data.meta.msg)
+        this.$message.error('获取动态参数/静态属性失败,' + res.data.meta.msg)
       }
     },
     // tab切换
     tabClick() {
-      if (this.activeProgress === '1') {
+      if (this.activeProgress === '1' || this.activeProgress === '2') {
         this.getParamsList()
       }
     }
