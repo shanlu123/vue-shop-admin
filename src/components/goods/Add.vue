@@ -19,10 +19,11 @@
              <el-step title="完成"></el-step>
         </el-steps>
         <!-- tab区域 -->
-        <el-tabs tab-position="left" v-model="activeProgress">
+        <el-tabs tab-position="left" v-model="activeProgress"  :before-leave="beforeTabLeave">
             <el-tab-pane label="基本信息" name="0">
                 <!-- 基本信息表单 -->
-                <el-form label-position="top" size="small" label-width="80px" :model="baseInfoForm" :rules="baseInfoFormRules">
+                <el-form label-position="top" size="small" label-width="80px"
+                  :model="baseInfoForm" :rules="baseInfoFormRules" ref="addFormRef">
                     <el-form-item label="商品名称" prop="goods_name">
                       <el-input v-model="baseInfoForm.goods_name"></el-input>
                     </el-form-item>
@@ -78,7 +79,8 @@ export default {
         label: 'cat_name',
         children: 'children',
         expandTrigger: 'hover'
-      }
+      },
+      isValid: false
     }
   },
   created() {
@@ -96,7 +98,29 @@ export default {
     },
     // 监听级联选择器中选择分类
     goodCatChange() {
-      console.log(this.baseInfoForm.goods_cat)
+      // console.log(this.baseInfoForm.goods_cat)
+      this.validateForm()
+      if (this.isValid) {
+        this.activeProgress = '1'
+      } else {
+        this.activeProgress = '0'
+      }
+    },
+    beforeTabLeave(activeName, oldActiveName) {
+      if (oldActiveName === '0') {
+        this.validateForm()
+        // console.log(this.isValid)
+        if (!this.isValid) {
+          this.$message.error('请完善基本信息')
+          return false
+        }
+      }
+    },
+    // 表单验证
+    validateForm() {
+      this.$refs.addFormRef.validate(valid => {
+        this.isValid = valid
+      })
     }
   }
 }
