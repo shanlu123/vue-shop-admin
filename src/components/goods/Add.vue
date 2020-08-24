@@ -48,7 +48,7 @@
             </el-tab-pane>
             <el-tab-pane label="商品参数" name="1">
               <!-- 商品参数表单 -->
-              <el-form label-position="top" size="mini" label-width="80px">
+              <el-form label-position="top" size="small" label-width="80px">
                 <el-form-item v-for="item in paramsList" :key="item.attr_id" :label="item.attr_name" >
                   <el-checkbox-group v-model="item.attr_vals">
                     <el-checkbox v-for="(attrVal,index) in item.attr_vals" :key="index" :label="attrVal" name="type"></el-checkbox>
