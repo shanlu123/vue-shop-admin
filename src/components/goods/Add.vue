@@ -77,6 +77,13 @@
             <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
         </el-tabs>
     </el-card>
+    <!-- 图片预览对话框 -->
+    <el-dialog
+      title="图片预览"
+      :visible.sync="previewPicDialog"
+      width="30%">
+      <img :src="prePicUrl" style="width:100%;"/>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -112,7 +119,9 @@ export default {
       uploadUrl: 'http://127.0.0.1:8888/api/private/v1/upload', // 图片上传地址
       reqHeader: { // 手动设置图片上传请求头
         Authorization: window.sessionStorage.getItem('token')
-      }
+      },
+      previewPicDialog: false, // 图片预览对话框显示与隐藏
+      prePicUrl: '' // 当前预览的图片地址
     }
   },
   computed: {
@@ -195,7 +204,8 @@ export default {
     },
     // 图片预览
     handlePreview(file) {
-      console.log(file)
+      this.prePicUrl = file.response.data.url
+      this.previewPicDialog = true
     },
     // 图片删除
     handleRemove(file, fileList) {
