@@ -104,7 +104,7 @@ export default {
     },
     // 跳转到添加商品页面
     toAddGood() {
-      this.$router.push('/home/goods/add')
+      this.$router.push('/home/add')
     }
   }
 }

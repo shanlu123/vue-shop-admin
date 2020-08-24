@@ -48,7 +48,7 @@ const routes = [
       path: '/home/goods',
       component: Goods
     }, {
-      path: '/home/goods/add',
+      path: '/home/add',
       component: Add
     }]
   }

@@ -19,7 +19,7 @@
              <el-step title="完成"></el-step>
         </el-steps>
         <!-- tab区域 -->
-        <el-tabs tab-position="left" v-model="activeProgress"  :before-leave="beforeTabLeave">
+        <el-tabs tab-position="left" v-model="activeProgress"  :before-leave="beforeTabLeave" @tab-click="tabClick">
             <el-tab-pane label="基本信息" name="0">
                 <!-- 基本信息表单 -->
                 <el-form label-position="top" size="small" label-width="80px"
@@ -46,7 +46,16 @@
                     </el-form-item>
                 </el-form>
             </el-tab-pane>
-            <el-tab-pane label="商品参数" name="1">商品参数</el-tab-pane>
+            <el-tab-pane label="商品参数" name="1">
+              <!-- 商品参数表单 -->
+              <el-form label-position="top" size="mini" label-width="80px">
+                <el-form-item v-for="item in paramsList" :key="item.attr_id" :label="item.attr_name" >
+                  <el-checkbox-group v-model="item.attr_vals">
+                    <el-checkbox v-for="(attrVal,index) in item.attr_vals" :key="index" :label="attrVal" name="type"></el-checkbox>
+                  </el-checkbox-group>
+                </el-form-item>
+              </el-form>
+            </el-tab-pane>
             <el-tab-pane label="商品属性" name="2">商品属性</el-tab-pane>
             <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
             <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
@@ -80,7 +89,8 @@ export default {
         children: 'children',
         expandTrigger: 'hover'
       },
-      isValid: false
+      isValid: false, // 添加表单预校验是否通过
+      paramsList: [] // 商品参数列表
     }
   },
   created() {
@@ -102,6 +112,7 @@ export default {
       this.validateForm()
       if (this.isValid) {
         this.activeProgress = '1'
+        this.getParamsList()
       } else {
         this.activeProgress = '0'
       }
@@ -121,6 +132,25 @@ export default {
       this.$refs.addFormRef.validate(valid => {
         this.isValid = valid
       })
+    },
+    // 获取商品参数面板信息
+    async getParamsList() {
+      const selectCatId = this.baseInfoForm.goods_cat[this.baseInfoForm.goods_cat.length - 1]
+      const res = await this.$http.get(`categories/${selectCatId}/attributes`, { params: { sel: 'many' } })
+      if (res.data.meta.status === 200) {
+        for (let i = 0; i < res.data.data.length; i++) {
+          res.data.data[i].attr_vals = res.data.data[i].attr_vals ? res.data.data[i].attr_vals.split(',') : []
+        }
+        this.paramsList = res.data.data
+      } else {
+        this.$message.error('获取参数列表失败,' + res.data.meta.msg)
+      }
+    },
+    // tab切换
+    tabClick() {
+      if (this.activeProgress === '1') {
+        this.getParamsList()
+      }
     }
   }
 }
