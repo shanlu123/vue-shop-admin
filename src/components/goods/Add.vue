@@ -68,7 +68,6 @@
                     :action="uploadUrl"
                     :on-preview="handlePreview"
                     :on-remove="handleRemove"
-                    :before-remove="beforeRemove"
                     list-type="picture"
                     :headers="reqHeader"
                     :on-success="uploadSuccess">
@@ -189,7 +188,7 @@ export default {
     // 图片上传成功
     uploadSuccess(response) {
       const picObj = {
-        pic: '/' + response.data.tmp_path
+        pic: response.data.tmp_path
       }
       this.baseInfoForm.pics.push(picObj)
       this.$message.success('上传成功')
@@ -198,13 +197,12 @@ export default {
     handlePreview(file) {
       console.log(file)
     },
-    // 图片删除前提醒
-    beforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`)
-    },
     // 图片删除
     handleRemove(file, fileList) {
-      console.log(file, fileList)
+      this.baseInfoForm.pics = this.baseInfoForm.pics.filter(item =>
+        item.pic !== file.response.data.tmp_path
+      )
+      this.$message.success('删除成功')
     }
   }
 }
