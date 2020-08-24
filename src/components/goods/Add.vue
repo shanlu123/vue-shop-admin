@@ -41,7 +41,7 @@
                           v-model="baseInfoForm.goods_cat"
                           :options="goodCatList"
                           :props="cascaderProps"
-                          @change="goodCatChange">
+                          @expand-change="goodCatChange">
                       </el-cascader>
                     </el-form-item>
                 </el-form>
@@ -77,7 +77,7 @@
             <el-tab-pane label="商品内容" name="4">
               <!-- 富文本编辑器 -->
               <quill-editor v-model="baseInfoForm.goods_introduce"></quill-editor>
-              <el-button type="primary" class="margin-bottom">添加商品</el-button>
+              <el-button type="primary" class="margin-bottom" @click="addGood">添加商品</el-button>
             </el-tab-pane>
         </el-tabs>
     </el-card>
@@ -102,7 +102,8 @@ export default {
         goods_number: '',
         goods_cat: '',
         pics: [], // 上传的图片，对象数组
-        goods_introduce: ''
+        goods_introduce: '',
+        attrs: [] // 属性，包括静态属性和动态参数
       },
       baseInfoFormRules: { // 基本信息表单验证规则
         goods_name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
@@ -151,7 +152,6 @@ export default {
     },
     // 监听级联选择器中选择分类
     goodCatChange() {
-      // console.log(this.baseInfoForm.goods_cat)
       this.validateForm()
       if (this.isValid) {
         this.activeProgress = '1'
@@ -218,6 +218,35 @@ export default {
         item.pic !== file.response.data.tmp_path
       )
       this.$message.success('删除成功')
+    },
+    // 添加商品
+    async addGood() {
+      // 处理goods_cat
+      this.baseInfoForm.goods_cat = this.baseInfoForm.goods_cat.join(',')
+      // 组建attrs
+      const dynamicObjs = []
+      const staticObjs = []
+      for (let i = 0; i < this.dynamicParams.length; i++) {
+        this.dynamicParams[i].attr_vals = this.dynamicParams[i].attr_vals.join(',')
+        const dynamicObj = {
+          attr_id: this.dynamicParams[i].attr_id,
+          attr_value: this.dynamicParams[i].attr_vals
+        }
+        dynamicObjs.push(dynamicObj)
+      }
+      for (let i = 0; i < this.staticAttrs.length; i++) {
+        const staticObj = {
+          attr_id: this.staticAttrs[i].attr_id,
+          attr_value: this.staticAttrs[i].attr_vals
+        }
+        staticObjs.push(staticObj)
+      }
+      this.baseInfoForm.attrs = [...dynamicObjs, ...staticObjs]
+      // 发起请求
+      const res = await this.$http.post('goods', this.baseInfoForm)
+      if (res.data.meta.status !== 201) return this.$message.error('创建商品失败,' + res.data.meta.msg)
+      this.$message.success('商品创建成功')
+      this.$router.push('/home/goods')
     }
   }
 }
