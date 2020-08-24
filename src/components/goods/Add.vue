@@ -74,7 +74,11 @@
                     <el-button size="small" type="primary">点击上传</el-button>
                 </el-upload>
             </el-tab-pane>
-            <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
+            <el-tab-pane label="商品内容" name="4">
+              <!-- 富文本编辑器 -->
+              <quill-editor v-model="baseInfoForm.goods_introduce"></quill-editor>
+              <el-button type="primary" class="margin-bottom">添加商品</el-button>
+            </el-tab-pane>
         </el-tabs>
     </el-card>
     <!-- 图片预览对话框 -->
@@ -97,7 +101,8 @@ export default {
         goods_weight: '',
         goods_number: '',
         goods_cat: '',
-        pics: [] // 上传的图片，对象数组
+        pics: [], // 上传的图片，对象数组
+        goods_introduce: ''
       },
       baseInfoFormRules: { // 基本信息表单验证规则
         goods_name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
@@ -217,3 +222,10 @@ export default {
   }
 }
 </script>
+
+<style>
+.quill-editor {
+  height:280px;
+  margin-bottom:60px;
+}
+</style>
