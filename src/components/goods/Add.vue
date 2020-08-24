@@ -63,7 +63,18 @@
                 </el-form-item>
               </el-form>
             </el-tab-pane>
-            <el-tab-pane label="商品图片" name="3">商品图片</el-tab-pane>
+            <el-tab-pane label="商品图片" name="3">
+                <el-upload
+                    :action="uploadUrl"
+                    :on-preview="handlePreview"
+                    :on-remove="handleRemove"
+                    :before-remove="beforeRemove"
+                    list-type="picture"
+                    :headers="reqHeader"
+                    :on-success="uploadSuccess">
+                    <el-button size="small" type="primary">点击上传</el-button>
+                </el-upload>
+            </el-tab-pane>
             <el-tab-pane label="商品内容" name="4">商品内容</el-tab-pane>
         </el-tabs>
     </el-card>
@@ -79,7 +90,8 @@ export default {
         goods_price: '',
         goods_weight: '',
         goods_number: '',
-        goods_cat: ''
+        goods_cat: '',
+        pics: [] // 上传的图片，对象数组
       },
       baseInfoFormRules: { // 基本信息表单验证规则
         goods_name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
@@ -97,7 +109,11 @@ export default {
       },
       isValid: false, // 添加表单预校验是否通过
       dynamicParams: [], // 商品动态参数列表
-      staticAttrs: [] // 商品静态属性列表
+      staticAttrs: [], // 商品静态属性列表
+      uploadUrl: 'http://127.0.0.1:8888/api/private/v1/upload', // 图片上传地址
+      reqHeader: { // 手动设置图片上传请求头
+        Authorization: window.sessionStorage.getItem('token')
+      }
     }
   },
   computed: {
@@ -169,6 +185,26 @@ export default {
       if (this.activeProgress === '1' || this.activeProgress === '2') {
         this.getParamsList()
       }
+    },
+    // 图片上传成功
+    uploadSuccess(response) {
+      const picObj = {
+        pic: '/' + response.data.tmp_path
+      }
+      this.baseInfoForm.pics.push(picObj)
+      this.$message.success('上传成功')
+    },
+    // 图片预览
+    handlePreview(file) {
+      console.log(file)
+    },
+    // 图片删除前提醒
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`)
+    },
+    // 图片删除
+    handleRemove(file, fileList) {
+      console.log(file, fileList)
     }
   }
 }
