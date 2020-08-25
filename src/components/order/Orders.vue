@@ -33,7 +33,7 @@
             </el-table-column>
             <el-table-column label="操作" width="180" align="center">
                 <template>
-                    <el-button size="mini" type="primary" icon="el-icon-edit"></el-button>
+                    <el-button size="mini" type="primary" icon="el-icon-edit" @click="editClick"></el-button>
                     <el-tooltip effect="dark" content="物流信息" placement="top" :enterable="false">
                         <el-button size="mini" type="warning" icon="el-icon-location"></el-button>
                     </el-tooltip>
@@ -51,10 +51,35 @@
             :total="total">
         </el-pagination>
     </el-card>
+    <!-- 修改地址对话框 -->
+    <el-dialog
+        title="修改地址"
+        :visible.sync="locaDialogVisible"
+        width="50%"
+        @close="locaDialogClose">
+        <el-form ref="editLocationRef" :model="editLocationForm" label-width="100px" :rules="editLocationRules">
+            <el-form-item label="省市区/县" prop="area">
+                <el-cascader
+                    v-model="editLocationForm.area"
+                    :options="cityData"
+                    :props="cascaderProps"
+                    @change="handleCityChange">
+                </el-cascader>
+            </el-form-item>
+            <el-form-item label="详细地址" prop="detailArea">
+              <el-input v-model="editLocationForm.detailArea"></el-input>
+            </el-form-item>
+        </el-form>
+        <span slot="footer">
+          <el-button @click="locaDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="locaDialogVisible = false">确 定</el-button>
+        </span>
+    </el-dialog>
  </div>
 </template>
 
 <script>
+import cityData from './citydata'
 export default {
   data: function() {
     return {
@@ -64,7 +89,23 @@ export default {
         pagenum: 1,
         pagesize: 5
       },
-      total: 0
+      total: 0,
+      locaDialogVisible: false, // 修改地址对话框显示与隐藏
+      cityData: cityData, // 级联选择器中城市数据
+      editLocationForm: { // 修改地址表单
+        area: [],
+        detailArea: ''
+      },
+      cascaderProps: { // 指定级联选择器的具体配置对象
+        value: 'value',
+        label: 'label',
+        children: 'children',
+        expandTrigger: 'hover'
+      },
+      editLocationRules: { // 编辑表单验证规则
+        area: [{ required: true, message: '请选择地址', trigger: 'blur' }],
+        detailArea: [{ required: true, message: '请输入详细地址', trigger: 'blur' }]
+      }
     }
   },
   created() {
@@ -90,6 +131,17 @@ export default {
     handleCurrentChange(curPageNum) {
       this.queryParams.pagenum = curPageNum
       this.getOrderList()
+    },
+    // 点击修改地址
+    editClick() {
+      this.locaDialogVisible = true
+    },
+    handleCityChange() {
+      console.log(this.editLocationForm.area)
+    },
+    // 关闭对话框
+    locaDialogClose() {
+      this.$refs.editLocationRef.resetFields()
     }
   }
 }
