@@ -32,10 +32,10 @@
                 <template v-slot="scope">{{scope.row.create_time | dateFormat}}</template>
             </el-table-column>
             <el-table-column label="操作" width="180" align="center">
-                <template>
+                <template v-slot="scope">
                     <el-button size="mini" type="primary" icon="el-icon-edit" @click="editClick"></el-button>
                     <el-tooltip effect="dark" content="物流信息" placement="top" :enterable="false">
-                        <el-button size="mini" type="warning" icon="el-icon-location"></el-button>
+                        <el-button size="mini" type="warning" icon="el-icon-location" @click="wuliuClick(scope.row.order_number)"></el-button>
                     </el-tooltip>
                 </template>
             </el-table-column>
@@ -75,6 +75,24 @@
           <el-button type="primary" @click="locaDialogVisible = false">确 定</el-button>
         </span>
     </el-dialog>
+    <!-- 查看物流进度对话框 -->
+    <el-dialog
+        title="查看物流进度"
+        :visible.sync="wuliuVisible"
+        width="50%">
+        <el-timeline reverse>
+            <el-timeline-item
+              v-for="(item,index) in wuliuInfo"
+              :key="index"
+              :timestamp="item.context">
+              {{item.time}}
+            </el-timeline-item>
+        </el-timeline>
+        <span slot="footer">
+          <el-button @click="wuliuVisible = false">取 消</el-button>
+          <el-button type="primary" @click="wuliuVisible = false">确 定</el-button>
+        </span>
+    </el-dialog>
  </div>
 </template>
 
@@ -91,6 +109,7 @@ export default {
       },
       total: 0,
       locaDialogVisible: false, // 修改地址对话框显示与隐藏
+      wuliuVisible: false, // 查看物流进度对话框显示与隐藏
       cityData: cityData, // 级联选择器中城市数据
       editLocationForm: { // 修改地址表单
         area: [],
@@ -105,7 +124,8 @@ export default {
       editLocationRules: { // 编辑表单验证规则
         area: [{ required: true, message: '请选择地址', trigger: 'blur' }],
         detailArea: [{ required: true, message: '请输入详细地址', trigger: 'blur' }]
-      }
+      },
+      wuliuInfo: [] // 物流信息
     }
   },
   created() {
@@ -142,6 +162,14 @@ export default {
     // 关闭对话框
     locaDialogClose() {
       this.$refs.editLocationRef.resetFields()
+    },
+    // 点击查看物流
+    async wuliuClick(orderNumber) {
+      // const res = await this.$http.get(`/kuaidi/${orderNumber}`)
+      const res = await this.$http.get('/kuaidi/1106975712662')
+      if (res.data.meta.status !== 200) return this.$message.error('获取物流信息失败,' + res.data.meta.msg)
+      this.wuliuInfo = res.data.data
+      this.wuliuVisible = true
     }
   }
 }
