@@ -4,8 +4,23 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <!-- 生产模式和发布模式标题设置 -->
+    <title><%= htmlWebpackPlugin.options.isProd ? 'prod-后台管理系统' : 'dev-后台管理系统' %></title>
+    <!-- 发布模式下使用cdn资源加载 -->
+    <% if(htmlWebpackPlugin.options.isProd) { %>
+    <!-- cdn资源css样式表文件 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/nprogress/0.1.2/nprogress.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/quill/0.15.0/themes/quill.snow.min.css" rel="stylesheet">
+    <!-- cdn资源JS文件 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/nprogress/0.1.2/nprogress.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/0.10.0/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue-router/0.4.0/vue-router.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.1.0/axios.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/0.1.0/lodash.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/2.1.10/echarts.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/quill/0.15.0/quill.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/0.1.1/index.js"></script>
+    <% } %>
   </head>
   <body>
     <noscript>

@@ -17,7 +17,7 @@
 <script>
 // 1,引入echarts
 import echarts from 'echarts'
-import _ from 'loadsh'
+import _ from 'lodash'
 export default {
   data: function() {
     return {

@@ -6,22 +6,11 @@ import TreeTable from 'vue-table-with-tree-grid'
 import VueQuillEditor from 'vue-quill-editor'
 import NProgress from 'nprogress'
 
-// elementui中的样式
-import './plugins/element.js'
-
 // 全局样式表
 import './assets/css/global.css'
 
 // 阿里字体图标样式
 import './assets/font/iconfont.css'
-
-// 富文本编辑器的样式
-import 'quill/dist/quill.core.css' // import styles
-import 'quill/dist/quill.snow.css' // for snow theme
-import 'quill/dist/quill.bubble.css' // for bubble theme
-
-// 进度条样式
-import 'nprogress/nprogress.css'
 
 // 配置axios
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
